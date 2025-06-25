@@ -18,11 +18,10 @@ public static class ExtnCfgItem{
 /// <param name="CfgAccessor"></param>
 /// <returns></returns>
 /// <exception cref="ArgumentException"></exception>
-	public static T? Get<T>(
+	public static T? GetFrom<T>(
 		this ICfgItem<T> Item
-		,ICfgAccessor? CfgAccessor = null
+		,ICfgAccessor CfgAccessor
 	)where T: class{
-		CfgAccessor ??= LocalCfg.Inst;
 		var Got = CfgAccessor.GetByPath(Item.Path);
 		if(Got == null){
 			return Item.DfltValue as T;
