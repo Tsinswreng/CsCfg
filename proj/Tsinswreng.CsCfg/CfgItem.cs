@@ -21,13 +21,15 @@ public static class ExtnCfgItem{
 	public static T? GetFrom<T>(
 		this ICfgItem<T> Item
 		,ICfgAccessor CfgAccessor
-	)where T: class{
+	)
+	//where T: class
+	{
 		var Got = CfgAccessor.GetByPath(Item.Path);
 		if(Got == null){
-			return Item.DfltValue as T;
+			return (T?)Item.DfltValue?.Data;
 		}
 		if (Got.Data == null){
-			return null;
+			return (T?)Item.DfltValue?.Data;
 		}
 		if(Got.Data is not T R){
 			throw new ArgumentException("Got.Data is not T: "+typeof(T));

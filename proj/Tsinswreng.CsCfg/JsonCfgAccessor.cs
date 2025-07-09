@@ -1,4 +1,4 @@
-using Tsinswreng.CsCore.Tools;
+using Tsinswreng.CsTools.Tools;
 
 namespace Tsinswreng.CsCfg;
 public class JsonCfgAccessor: ICfgAccessor{
