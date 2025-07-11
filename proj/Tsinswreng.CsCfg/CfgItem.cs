@@ -4,8 +4,10 @@ public class CfgItem<T>:ICfgItem<T>{
 	public CfgItem(){
 
 	}
-	public IList<str> Path{get;set;} = [];
+	public IList<str> RelaPath{get;set;} = [];
 	public ICfgValue? DfltValue{get;set;}
+	public ICfgItem? Parent{get;set;}
+	public IList<ICfgItem>? Children{get;set;}
 }
 
 public static class ExtnCfgItem{
@@ -24,7 +26,7 @@ public static class ExtnCfgItem{
 	)
 	//where T: class
 	{
-		var Got = CfgAccessor.GetByPath(Item.Path);
+		var Got = CfgAccessor.GetByPath(Item.GetFullPath());
 		if(Got == null){
 			return (T?)Item.DfltValue?.Data;
 		}
@@ -37,8 +39,32 @@ public static class ExtnCfgItem{
 		return R;
 	}
 
-	public static ICfgItem<object?> Mk(IList<str> Path, ICfgValue? DfltValue = null){
-		return new CfgItem<object?>{Path=Path, DfltValue=DfltValue};
+	public static IList<str> GetFullPath(
+		this ICfgItem Item
+	){
+		var Cur = Item;
+		var List2D = new List<IList<str>>();
+		for(;;){
+			if(Cur == null){break;}
+			List2D.Add(Cur.RelaPath);
+			Cur = Cur.Parent;
+		}
+		List2D.Reverse();
+		var R = new List<str>();
+		foreach(var List in List2D){
+			foreach(var Path in List){
+				R.Add(Path);
+			}
+		}
+		return R;
+	}
+
+	public static ICfgItem<object?> Mk(
+		IList<str> Path
+		,ICfgValue? DfltValue = null
+		,ICfgItem? Parent = null
+	){
+		return new CfgItem<object?>{RelaPath=Path, DfltValue=DfltValue, Parent=Parent};
 	}
 /// <summary>
 /// 如需列表則需定義潙IList<object> 不支持IList<str>等!
@@ -47,9 +73,13 @@ public static class ExtnCfgItem{
 /// <param name="Path"></param>
 /// <param name="DfltValue"></param>
 /// <returns></returns>
-	public static ICfgItem<T2> Mk<T2>(IList<str> Path, T2 DfltValue = default!){
+	public static ICfgItem<T2> Mk<T2>(
+		IList<str> Path
+		,T2 DfltValue = default!
+		,ICfgItem? Parent = null
+	){
 		var V = new CfgValue(){Type=typeof(T2), Data=DfltValue};
-		return new CfgItem<T2>{Path=Path, DfltValue=V};
+		return new CfgItem<T2>{RelaPath=Path, DfltValue=V, Parent=Parent};
 	}
 
 
