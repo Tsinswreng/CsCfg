@@ -8,7 +8,8 @@ public interface ICfgItem{
 	public IList<ICfgItem>? Children{get;set;}
 }
 
-public interface ICfgItem<T>:ICfgItem{
+public interface ICfgItem<T>:ICfgItem
+{
 
 }
 
