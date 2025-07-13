@@ -65,12 +65,22 @@ public static class ExtnCfgItem{
 	}
 
 	public static ICfgItem<object?> Mk(
-		IList<str> Path
+		ICfgItem? Parent
+		,IList<str> Path
 		,ICfgValue? DfltValue = null
-		,ICfgItem? Parent = null
 	){
 		return new CfgItem<object?>{RelaPath=Path, DfltValue=DfltValue, Parent=Parent};
 	}
+
+	// [Obsolete("用Mk")]
+	// public static ICfgItem<object?> OldMk(
+	// 	IList<str> Path
+	// 	,ICfgValue? DfltValue = null
+	// 	,ICfgItem? Parent = null
+	// ){
+	// 	return new CfgItem<object?>{RelaPath=Path, DfltValue=DfltValue, Parent=Parent};
+	// }
+
 /// <summary>
 /// 如需列表則需定義潙IList<object> 不支持IList<str>等!
 /// </summary>
@@ -79,13 +89,23 @@ public static class ExtnCfgItem{
 /// <param name="DfltValue"></param>
 /// <returns></returns>
 	public static ICfgItem<T2> Mk<T2>(
-		IList<str> Path
+		ICfgItem? Parent
+		,IList<str> Path
 		,T2 DfltValue = default!
-		,ICfgItem? Parent = null
 	){
 		var V = new CfgValue(){Type=typeof(T2), Data=DfltValue};
 		return new CfgItem<T2>{RelaPath=Path, DfltValue=V, Parent=Parent};
 	}
+
+	// [Obsolete("用Mk")]
+	// public static ICfgItem<T2> OldMk<T2>(
+	// 	IList<str> Path
+	// 	,T2 DfltValue = default!
+	// 	,ICfgItem? Parent = null
+	// ){
+	// 	var V = new CfgValue(){Type=typeof(T2), Data=DfltValue};
+	// 	return new CfgItem<T2>{RelaPath=Path, DfltValue=V, Parent=Parent};
+	// }
 
 
 	// public static T? Get<T>(
