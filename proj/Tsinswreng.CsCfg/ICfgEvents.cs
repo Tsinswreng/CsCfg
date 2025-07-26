@@ -1,5 +1,5 @@
 namespace Tsinswreng.CsCfg;
-public interface ICfgEvents{
+public  partial interface ICfgEvents{
 	public event EventHandler BeforeGetByPath;
 	public event EventHandler BeforeSetByPath;
 	public event EventHandler BeforeRmPath;

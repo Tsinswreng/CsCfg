@@ -2,7 +2,7 @@
 namespace Tsinswreng.CsCfg;
 
 
-public interface ICfgAccessor{
+public  partial interface ICfgAccessor{
 	public ICfgValue? GetByPath(IList<str> Path);
 	/// <summary>
 	/// 未必持久化
