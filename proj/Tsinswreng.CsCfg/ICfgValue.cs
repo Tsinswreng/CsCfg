@@ -1,4 +1,4 @@
-using Tsinswreng.CsTools.Tools;
+using Tsinswreng.CsTools;
 
 namespace Tsinswreng.CsCfg;
 
@@ -7,6 +7,6 @@ public interface ICfgValue: ITypedObj{
 }
 
 
-// public class ExtnITypedObj{
+// public  partial class ExtnITypedObj{
 // 	public static
 // }

@@ -1,5 +1,5 @@
 namespace Tsinswreng.CsCfg;
-public class CfgValue: ICfgValue{
+public  partial class CfgValue: ICfgValue{
 	public Type? Type{get;set;}
 	//用戶自定義
 	public long TypeCode{get;set;}

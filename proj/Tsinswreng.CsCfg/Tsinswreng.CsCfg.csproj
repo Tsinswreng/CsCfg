@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<Compile Include="../TypeAlias.cs" />
+		<ProjectReference Include="../../../Tsinswreng.CsCore/proj/Tsinswreng.CsCore/Tsinswreng.CsCore.csproj" />
 		<ProjectReference Include="../../../Tsinswreng.CsTools/proj/Tsinswreng.CsTools/Tsinswreng.CsTools.csproj" />
 	</ItemGroup>
 

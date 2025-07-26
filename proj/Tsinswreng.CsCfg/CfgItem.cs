@@ -1,6 +1,6 @@
 namespace Tsinswreng.CsCfg;
-//TODO獨立作項目
-public class CfgItem<T>:ICfgItem<T>{
+
+public  partial class CfgItem<T>:ICfgItem<T>{
 	public CfgItem(){
 
 	}
@@ -40,7 +40,6 @@ public static class ExtnCfgItem{
 		}else{
 			//return (T?)Got.Data; i64轉i32會報錯
 			return (T)Convert.ChangeType(Got.Data, typeof(T));
-
 		}
 	}
 
@@ -64,7 +63,7 @@ public static class ExtnCfgItem{
 		return R;
 	}
 
-	public static ICfgItem<object?> Mk(
+	public static ICfgItem<object?>Mk(
 		ICfgItem? Parent
 		,IList<str> Path
 		,ICfgValue? DfltValue = null
