@@ -1,15 +1,27 @@
+using Tsinswreng.CsCore;
+
 namespace Tsinswreng.CsCfg;
 public  partial interface ICfgEvents{
-	public event EventHandler BeforeGetByPath;
-	public event EventHandler BeforeSetByPath;
-	public event EventHandler BeforeRmPath;
-	public event EventHandler BeforeReLoad;
-	public event EventHandler BeforeSave;
+	[Impl(typeof(ICfgEvents))]
+	public event EventHandler? BeforeGetByPath;
+	[Impl(typeof(ICfgEvents))]
+	public event EventHandler? BeforeSetByPath;
+	[Impl(typeof(ICfgEvents))]
+	public event EventHandler? BeforeRmPath;
+	[Impl(typeof(ICfgEvents))]
+	public event EventHandler? BeforeReLoad;
+	[Impl(typeof(ICfgEvents))]
+	public event EventHandler? BeforeSave;
 
 
-	public event EventHandler AfterGetByPath;
-	public event EventHandler AfterSetByPath;
-	public event EventHandler AfterRmPath;
-	public event EventHandler AfterReLoad;
-	public event EventHandler AfterSave;
+	[Impl(typeof(ICfgEvents))]
+	public event EventHandler? AfterGetByPath;
+	[Impl(typeof(ICfgEvents))]
+	public event EventHandler? AfterSetByPath;
+	[Impl(typeof(ICfgEvents))]
+	public event EventHandler? AfterRmPath;
+	[Impl(typeof(ICfgEvents))]
+	public event EventHandler? AfterReLoad;
+	[Impl(typeof(ICfgEvents))]
+	public event EventHandler? AfterSave;
 }

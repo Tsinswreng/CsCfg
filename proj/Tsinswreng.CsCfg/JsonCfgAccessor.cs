@@ -60,11 +60,26 @@ public partial class JsonFileCfgAccessor
 		return NIL;
 	}
 
+	[Impl(typeof(ICfgAccessor))]
+	public bool TryGetByPath(
+		IList<str> Path
+		,out ICfgValue? Got
+	){
+		if( ToolDict.TryGetValueByPath(CfgDict, Path, out var VObj) ){
+			Got = new CfgValue{Data=VObj};
+			return true;
+		}
+		Got = null;
+		return false;
+	}
+
 
 	[Impl]
 	public ICfgValue? GetByPath(IList<str> Path){
-		var V = ToolDict.GetValueByPath(CfgDict, Path);
-		return new CfgValue{Data=V};
+		if(this.TryGetByPath(Path, out var Got)){
+			return Got;
+		}
+		return null;
 	}
 
 	[Impl]
