@@ -17,7 +17,7 @@ public  partial interface ICfgAccessor{
 	[Impl(typeof(ICfgAccessor))]
 	public bool TryGetByPath(
 		IList<str> Path
-		,out ICfgValue? Got
+		,out ICfgValue Got
 	);
 	/// <summary>
 	/// 未必持久化

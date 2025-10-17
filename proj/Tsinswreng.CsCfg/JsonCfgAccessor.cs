@@ -1,9 +1,10 @@
 #define Impl
+namespace Tsinswreng.CsCfg;
 using System.Collections;
 using Tsinswreng.CsCore;
 using Tsinswreng.CsTools;
 
-namespace Tsinswreng.CsCfg;
+
 public partial class JsonFileCfgAccessor
 	:ICfgAccessor
 	,ICfgEvents
@@ -63,13 +64,13 @@ public partial class JsonFileCfgAccessor
 	[Impl(typeof(ICfgAccessor))]
 	public bool TryGetByPath(
 		IList<str> Path
-		,out ICfgValue? Got
+		,out ICfgValue Got
 	){
 		if( ToolDict.TryGetValueByPath(CfgDict, Path, out var VObj) ){
 			Got = new CfgValue{Data=VObj};
 			return true;
 		}
-		Got = null;
+		Got = default!;
 		return false;
 	}
 
@@ -113,7 +114,7 @@ public partial class JsonFileCfgAccessor
 	}
 
 	public async Task<nil> _SaveAsy(CT Ct) {
-		var Json = ToolJson.CollectionToJson(CfgDict);
+		var Json = ToolJson.DictToJson(CfgDict);
 		await File.WriteAllTextAsync(FilePath, Json, Ct);
 		return NIL;
 	}

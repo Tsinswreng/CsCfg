@@ -26,7 +26,7 @@ public class DualSrcCfg:ICfgAccessor{
 	[Impl(typeof(ICfgAccessor))]
 	public bool TryGetByPath(
 		IList<str> Path
-		,out ICfgValue? Got
+		,out ICfgValue Got
 	){
 		if(RoCfg != null && RoCfg.TryGetByPath(Path, out Got)){
 			return true;
@@ -34,7 +34,7 @@ public class DualSrcCfg:ICfgAccessor{
 		if(RwCfg != null && RwCfg.TryGetByPath(Path, out Got)){
 			return true;
 		}
-		Got = null;
+		Got = default!;
 		return false;
 	}
 
