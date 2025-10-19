@@ -44,6 +44,19 @@ public partial class CfgItem<T>:ICfgItem<T>{
 }
 
 public static class ExtnCfgItem{
+	public static Func<ICfgItem<T>, T?> MkFnGet<T>(this ICfgAccessor z){
+		return (CfgItem)=>{
+			return CfgItem.GetFrom(z);
+		};
+	}
+
+	public static T? GetT<T>(
+		this ICfgAccessor z
+		,ICfgItem<T> CfgItem
+	){
+		return CfgItem.GetFrom(z);
+	}
+
 /// <summary>
 ///
 /// </summary>
@@ -58,7 +71,7 @@ public static class ExtnCfgItem{
 	)
 	//where T: class
 	{
-		var Got = CfgAccessor.GetByPath(Item.GetFullPathSegs());
+		var Got = CfgAccessor.GetBoxedByPath(Item.GetFullPathSegs());
 		if(Got == null || Got.Data == null){
 			return (T?)Item.DfltValue?.Data;
 		}

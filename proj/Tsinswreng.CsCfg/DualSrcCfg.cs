@@ -24,14 +24,14 @@ public class DualSrcCfg:ICfgAccessor{
 	}
 
 	[Impl(typeof(ICfgAccessor))]
-	public bool TryGetByPath(
+	public bool TryGetBoxedByPath(
 		IList<str> Path
 		,out ICfgValue Got
 	){
-		if(RoCfg != null && RoCfg.TryGetByPath(Path, out Got)){
+		if(RoCfg != null && RoCfg.TryGetBoxedByPath(Path, out Got)){
 			return true;
 		}
-		if(RwCfg != null && RwCfg.TryGetByPath(Path, out Got)){
+		if(RwCfg != null && RwCfg.TryGetBoxedByPath(Path, out Got)){
 			return true;
 		}
 		Got = default!;
@@ -39,8 +39,8 @@ public class DualSrcCfg:ICfgAccessor{
 	}
 
 	[Impl(typeof(ICfgAccessor))]
-	public ICfgValue? GetByPath(IList<str> Path){
-		if(this.TryGetByPath(Path, out var Got)){
+	public ICfgValue? GetBoxedByPath(IList<str> Path){
+		if(this.TryGetBoxedByPath(Path, out var Got)){
 			return Got;
 		}
 		return null;
@@ -64,8 +64,8 @@ public class DualSrcCfg:ICfgAccessor{
 	/// <param name="Value"></param>
 	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
-	public nil SetByPath(IList<str> Path, ICfgValue Value){
-		RwCfg?.SetByPath(Path, Value);
+	public nil SetBoxedByPath(IList<str> Path, ICfgValue Value){
+		RwCfg?.SetBoxedByPath(Path, Value);
 		return NIL;
 	}
 	/// <summary>

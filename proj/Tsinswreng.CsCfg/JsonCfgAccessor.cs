@@ -62,7 +62,7 @@ public partial class JsonFileCfgAccessor
 	}
 
 	[Impl(typeof(ICfgAccessor))]
-	public bool TryGetByPath(
+	public bool TryGetBoxedByPath(
 		IList<str> Path
 		,out ICfgValue Got
 	){
@@ -76,15 +76,15 @@ public partial class JsonFileCfgAccessor
 
 
 	[Impl]
-	public ICfgValue? GetByPath(IList<str> Path){
-		if(this.TryGetByPath(Path, out var Got)){
+	public ICfgValue? GetBoxedByPath(IList<str> Path){
+		if(this.TryGetBoxedByPath(Path, out var Got)){
 			return Got;
 		}
 		return null;
 	}
 
 	[Impl]
-	public nil SetByPath(IList<str> Path, ICfgValue Value){
+	public nil SetBoxedByPath(IList<str> Path, ICfgValue Value){
 		ToolDict.PutValueByPath(CfgDict, Path, Value.Data);
 		return NIL;
 	}

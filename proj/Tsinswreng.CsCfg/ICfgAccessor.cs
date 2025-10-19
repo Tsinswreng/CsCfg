@@ -12,10 +12,10 @@ public  partial interface ICfgAccessor{
 	/// <param name="Path"></param>
 	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
-	public ICfgValue? GetByPath(IList<str> Path);
+	public ICfgValue? GetBoxedByPath(IList<str> Path);
 
 	[Impl(typeof(ICfgAccessor))]
-	public bool TryGetByPath(
+	public bool TryGetBoxedByPath(
 		IList<str> Path
 		,out ICfgValue Got
 	);
@@ -26,7 +26,7 @@ public  partial interface ICfgAccessor{
 	/// <param name="Value"></param>
 	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
-	public nil SetByPath(IList<str> Path, ICfgValue Value);
+	public nil SetBoxedByPath(IList<str> Path, ICfgValue Value);
 	/// <summary>
 	/// 未必持久化
 	/// </summary>
