@@ -50,7 +50,7 @@ public static class ExtnCfgItem{
 		};
 	}
 
-	public static T? GetT<T>(
+	public static T? Get<T>(
 		this ICfgAccessor z
 		,ICfgItem<T> CfgItem
 	){
