@@ -1,10 +1,13 @@
 namespace Tsinswreng.CsCfg;
 
 public partial class CfgItem<T>:ICfgItem<T>{
+	public const str PathSep = "/";
 	public CfgItem(){
 
 	}
+
 	public IList<str> RelaPathSegs{get;set;} = [];
+	public str? _LazyFullPath{get;set;}
 	public ICfgValue? DfltValue{get;set;}
 	public ICfgItem? Parent{get;set;}
 	public IList<ICfgItem>? Children{get;set;}
@@ -105,6 +108,19 @@ public static class ExtnCfgItem{
 				R.Add(Path);
 			}
 		}
+		return R;
+	}
+
+	public static str GetFullPath(
+		this ICfgItem z
+		,str Sep = CfgItem<nil>.PathSep
+	){
+		if(z._LazyFullPath is not null){
+			return z._LazyFullPath;
+		}
+		var Segs = z.GetFullPathSegs();
+		var R = string.Join(Sep, Segs);
+		z._LazyFullPath = R;
 		return R;
 	}
 
