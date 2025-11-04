@@ -33,7 +33,24 @@ public partial class JsonFileCfgAccessor
 		var z = this;
 		z.FilePath = FilePath;
 		var JsonStr = await File.ReadAllTextAsync(FilePath, Ct);
-		z.CfgDict = ToolJson.JsonStrToDict(JsonStr)??MkDict();
+		if(str.IsNullOrEmpty(JsonStr)){
+			z.CfgDict = MkDict();
+		}else{
+			z.CfgDict = ToolJson.JsonStrToDict(JsonStr)??MkDict();
+		}
+		return z;
+	}
+
+
+	public JsonFileCfgAccessor FromFile(str FilePath){
+		var z = this;
+		z.FilePath = FilePath;
+		var JsonStr = File.ReadAllText(FilePath);
+		if(str.IsNullOrEmpty(JsonStr)){
+			z.CfgDict = MkDict();
+		}else{
+			z.CfgDict = ToolJson.JsonStrToDict(JsonStr)??MkDict();
+		}
 		return z;
 	}
 
@@ -84,7 +101,7 @@ public partial class JsonFileCfgAccessor
 	}
 
 	[Impl]
-	public nil SetBoxedByPath(IList<str> Path, ICfgValue Value){
+	public nil SetBoxedByPathNonSave(IList<str> Path, ICfgValue Value){
 		ToolDict.PutValueByPath(CfgDict, Path, Value.Data);
 		return NIL;
 	}

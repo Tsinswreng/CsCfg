@@ -26,7 +26,7 @@ public  partial interface ICfgAccessor{
 	/// <param name="Value"></param>
 	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
-	public nil SetBoxedByPath(IList<str> Path, ICfgValue Value);
+	public nil SetBoxedByPathNonSave(IList<str> Path, ICfgValue Value);
 	/// <summary>
 	/// 未必持久化
 	/// </summary>

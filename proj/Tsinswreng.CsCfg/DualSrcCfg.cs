@@ -64,8 +64,8 @@ public class DualSrcCfg:ICfgAccessor{
 	/// <param name="Value"></param>
 	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
-	public nil SetBoxedByPath(IList<str> Path, ICfgValue Value){
-		RwCfg?.SetBoxedByPath(Path, Value);
+	public nil SetBoxedByPathNonSave(IList<str> Path, ICfgValue Value){
+		RwCfg?.SetBoxedByPathNonSave(Path, Value);
 		return NIL;
 	}
 	/// <summary>
