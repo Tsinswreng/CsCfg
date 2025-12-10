@@ -9,7 +9,7 @@ public partial interface ICfgItem{
 	public IList<ICfgItem>? Children{get;set;}
 
 }
-
+//勿用泛型ˉIList<> 緣讀配置旹只能得IList<obj>
 public partial interface ICfgItem<T>:ICfgItem
 {
 
