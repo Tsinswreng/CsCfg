@@ -1,18 +1,6 @@
 namespace Tsinswreng.CsCfg;
 
 public static class ExtnICfgItem{
-	public static Func<ICfgItem<T>, T?> MkFnGet<T>(this ICfgAccessor z){
-		return (CfgItem)=>{
-			return CfgItem.GetFrom(z);
-		};
-	}
-
-	public static T? Get<T>(
-		this ICfgAccessor z
-		,ICfgItem<T> CfgItem
-	){
-		return CfgItem.GetFrom(z);
-	}
 
 	public static T? GetFrom<T>(
 		this ICfgItem<T> Item //int? is not int
