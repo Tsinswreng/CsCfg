@@ -102,13 +102,13 @@ public partial class JsonFileCfgAccessor
 
 	[Impl]
 	public nil SetBoxedByPathNonSave(IList<str> Path, ICfgValue Value){
-		ToolDict.PutValueByPath(CfgDict, Path, Value.Data);
+		ToolDict.SetValueByPath(CfgDict, Path, Value.Data);
 		return NIL;
 	}
 
 	[Impl]
 	public nil RmPath(IList<str> Path){
-		ToolDict.PutValueByPath(CfgDict, Path, NIL);
+		ToolDict.SetValueByPath(CfgDict, Path, NIL);
 		return NIL;
 	}
 

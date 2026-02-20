@@ -5,12 +5,8 @@ namespace Tsinswreng.CsCfg;
 
 
 
-public  partial interface ICfgAccessor{
-	/// <summary>
+public partial interface ICfgAccessor{
 	/// 無旹返null
-	/// </summary>
-	/// <param name="Path"></param>
-	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
 	public ICfgValue? GetBoxedByPath(IList<str> Path);
 
@@ -19,33 +15,17 @@ public  partial interface ICfgAccessor{
 		IList<str> Path
 		,out ICfgValue Got
 	);
-	/// <summary>
 	/// 未必持久化
-	/// </summary>
-	/// <param name="Path"></param>
-	/// <param name="Value"></param>
-	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
 	public nil SetBoxedByPathNonSave(IList<str> Path, ICfgValue Value);
-	/// <summary>
 	/// 未必持久化
-	/// </summary>
-	/// <param name="Path"></param>
-	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
 	public nil RmPath(IList<str> Path);
-	/// <summary>
-	///
-	/// </summary>
-	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
 	public nil ReLoad();
 	[Impl(typeof(ICfgAccessor))]
 	public Task<nil> ReLoadAsy(CT Ct);
-	/// <summary>
 	/// 持久化
-	/// </summary>
-	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
 	public nil Save();
 	[Impl(typeof(ICfgAccessor))]

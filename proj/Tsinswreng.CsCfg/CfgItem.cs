@@ -20,22 +20,7 @@ public partial class CfgItem<T>:ICfgItem<T>{
 		return new CfgItem<object?>{RelaPathSegs=Path, DfltValue=DfltValue, Parent=Parent};
 	}
 
-	// [Obsolete("用Mk")]
-	// public static ICfgItem<object?> OldMk(
-	// 	IList<str> Path
-	// 	,ICfgValue? DfltValue = null
-	// 	,ICfgItem? Parent = null
-	// ){
-	// 	return new CfgItem<object?>{RelaPath=Path, DfltValue=DfltValue, Parent=Parent};
-	// }
-
-/// <summary>
 /// 如需列表則需定義潙IList<object> 不支持IList<str>等!
-/// </summary>
-/// <typeparam name="T2"></typeparam>
-/// <param name="Path"></param>
-/// <param name="DfltValue"></param>
-/// <returns></returns>
 	public static ICfgItem<T2> Mk<T2>(
 		ICfgItem? Parent
 		,IList<str> Path
@@ -60,14 +45,6 @@ public static class ExtnCfgItem{
 		return CfgItem.GetFrom(z);
 	}
 
-/// <summary>
-///
-/// </summary>
-/// <typeparam name="T"></typeparam>
-/// <param name="Item"></param>
-/// <param name="CfgAccessor"></param>
-/// <returns></returns>
-/// <exception cref="ArgumentException"></exception>
 	public static T? GetFrom<T>(
 		this ICfgItem<T> Item //int? is not int
 		,ICfgAccessor CfgAccessor
