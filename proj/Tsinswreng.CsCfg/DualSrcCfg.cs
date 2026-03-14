@@ -4,15 +4,11 @@ namespace Tsinswreng.CsCfg;
 
 //TODO implement event
 public class DualSrcCfg:ICfgAccessor{
-	/// <summary>
 	/// read only config
 	/// GetByPath旹更優先
-	/// </summary>
 	public ICfgAccessor? RoCfg{get;set;}
-	/// <summary>
 	/// read write config
 	/// 用作用戶GUI配置
-	/// </summary>
 	public ICfgAccessor? RwCfg{get;set;}
 	public DualSrcCfg(){}
 	public DualSrcCfg(
@@ -57,9 +53,7 @@ public class DualSrcCfg:ICfgAccessor{
 	// }
 
 
-	/// <summary>
 	/// 未必持久化
-	/// </summary>
 	/// <param name="Path"></param>
 	/// <param name="Value"></param>
 	/// <returns></returns>
@@ -68,9 +62,7 @@ public class DualSrcCfg:ICfgAccessor{
 		RwCfg?.SetBoxedByPathNonSave(Path, Value);
 		return NIL;
 	}
-	/// <summary>
 	/// 未必持久化
-	/// </summary>
 	/// <param name="Path"></param>
 	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
@@ -78,9 +70,7 @@ public class DualSrcCfg:ICfgAccessor{
 		RwCfg?.RmPath(Path);
 		return NIL;
 	}
-	/// <summary>
 	///
-	/// </summary>
 	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
 	public nil ReLoad(){
@@ -99,9 +89,7 @@ public class DualSrcCfg:ICfgAccessor{
 		}
 		return NIL;
 	}
-	/// <summary>
 	/// 持久化
-	/// </summary>
 	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
 	public nil Save(){
