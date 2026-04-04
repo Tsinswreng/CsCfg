@@ -2,7 +2,7 @@ using Tsinswreng.CsCore;
 
 namespace Tsinswreng.CsCfg;
 
-//TODO implement event
+[Doc(@$"Dual Source Config Accessor")]
 public class DualSrcCfg:ICfgAccessor{
 	/// read only config
 	/// GetByPath旹更優先
@@ -42,55 +42,38 @@ public class DualSrcCfg:ICfgAccessor{
 		return null;
 	}
 
-
-	// [Impl(typeof(ICfgAccessor))]
-	// public ICfgValue? GetByPath(IList<str> Path){
-	// 	var R = RoCfg?.GetByPath(Path);
-	// 	if(R != null){
-	// 		return R;
-	// 	}
-	// 	return RwCfg?.GetByPath(Path);
-	// }
-
-
-	/// 未必持久化
-	/// <param name="Path"></param>
-	/// <param name="Value"></param>
-	/// <returns></returns>
 	[Impl(typeof(ICfgAccessor))]
 	public nil SetBoxedByPathNonSave(IList<str> Path, ICfgValue Value){
 		RwCfg?.SetBoxedByPathNonSave(Path, Value);
 		return NIL;
 	}
-	/// 未必持久化
-	/// <param name="Path"></param>
-	/// <returns></returns>
+	
+	
 	[Impl(typeof(ICfgAccessor))]
-	public nil RmPath(IList<str> Path){
-		RwCfg?.RmPath(Path);
+	public nil RmPathNoSave(IList<str> Path){
+		RwCfg?.RmPathNoSave(Path);
 		return NIL;
 	}
-	///
-	/// <returns></returns>
+	
 	[Impl(typeof(ICfgAccessor))]
-	public nil ReLoad(){
-		RoCfg?.ReLoad();
-		RwCfg?.ReLoad();
+	public nil Reload(){
+		RoCfg?.Reload();
+		RwCfg?.Reload();
 		return NIL;
 	}
 
 	[Impl(typeof(ICfgAccessor))]
-	public async Task<nil> ReLoadAsy(CT Ct){
+	public async Task<nil> Reload(CT Ct){
 		if(RoCfg != null){
-			await RoCfg.ReLoadAsy(Ct);
+			await RoCfg.Reload(Ct);
 		}
 		if(RwCfg != null){
-			await RwCfg.ReLoadAsy(Ct);
+			await RwCfg.Reload(Ct);
 		}
 		return NIL;
 	}
-	/// 持久化
-	/// <returns></returns>
+	
+	
 	[Impl(typeof(ICfgAccessor))]
 	public nil Save(){
 		//RoCfg.Save();
@@ -100,10 +83,10 @@ public class DualSrcCfg:ICfgAccessor{
 		return NIL;
 	}
 	[Impl(typeof(ICfgAccessor))]
-	public async Task<nil> SaveAsy(CT Ct){
+	public async Task<nil> Save(CT Ct){
 		//await RoCfg.SaveAsy(Ct);
 		if(RwCfg != null){
-			await RwCfg.SaveAsy(Ct);
+			await RwCfg.Save(Ct);
 		}
 		return NIL;
 	}

@@ -1,7 +1,7 @@
 using Tsinswreng.CsCore;
 
 namespace Tsinswreng.CsCfg;
-public  partial interface ICfgEvents{
+public partial interface ICfgEvents{
 	[Impl(typeof(ICfgEvents))]
 	public event EventHandler? BeforeGetByPath;
 	[Impl(typeof(ICfgEvents))]

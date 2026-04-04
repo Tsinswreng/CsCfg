@@ -4,15 +4,12 @@ using System.Collections;
 using Tsinswreng.CsCore;
 using Tsinswreng.CsTools;
 
-
 public partial class JsonFileCfgAccessor
 	:ICfgAccessor
 	,ICfgEvents
 	,I_CfgDict
 {
-// protected static JsonCfgAccessor? _Inst = null;
-// public static JsonCfgAccessor Inst => _Inst??= new JsonCfgAccessor();
-
+	[Doc(@$"Json File Path")]
 	public str FilePath{get;set;} = "";
 
 	[Impl]
@@ -55,15 +52,14 @@ public partial class JsonFileCfgAccessor
 	}
 
 
-
 	[Impl]
-	public nil ReLoad(){
-		ReLoadAsy(default).Wait();
+	public nil Reload(){
+		Reload(default).Wait();
 		return NIL;
 	}
 
 	[Impl]
-	public async Task<nil> ReLoadAsy(CT Ct) {
+	public async Task<nil> Reload(CT Ct) {
 		BeforeReLoad?.Invoke(this, null!);
 		if(FnReLoadAsy != null){
 			return await FnReLoadAsy(this, Ct);
@@ -77,6 +73,56 @@ public partial class JsonFileCfgAccessor
 		await FromFileAsy(FilePath, Ct);
 		return NIL;
 	}
+	
+	[Impl(typeof(ICfgAccessor))]
+	public bool TryGet(
+		IList<str> Path, out obj? Got
+	){
+		Got = default;
+		if( ToolDict.TryGetValueByPath(CfgDict, Path, out var VObj) ){
+			Got = VObj;
+			return true;
+		}
+		return false;
+	}
+	
+	[Impl(typeof(ICfgAccessor))]
+	public bool TrySetNoSave(IList<str> Path, obj? V){
+		return ToolDict.SetValueByPath(CfgDict, Path, V);
+	}
+	
+
+	[Impl]
+	public nil RmPathNoSave(IList<str> Path){
+		ToolDict.SetValueByPath(CfgDict, Path, NIL);
+		return NIL;
+	}
+
+	[Impl]
+	public nil Save(){
+		Save(default).Wait();
+		return NIL;
+	}
+
+
+	[Impl]
+	public async Task<nil> Save(CT Ct) {
+		BeforeSave?.Invoke(this, null!);
+		if(FnSaveAsy!=null){
+			return await FnSaveAsy(this, Ct);
+		}
+		await _SaveAsy(Ct);
+		AfterSave?.Invoke(this, null!);
+		return NIL;
+	}
+
+	public async Task<nil> _SaveAsy(CT Ct) {
+		var Json = ToolJson.DictToJson(CfgDict);
+		await File.WriteAllTextAsync(FilePath, Json, Ct);
+		return NIL;
+	}
+	
+	#region Obslt
 
 	[Impl(typeof(ICfgAccessor))]
 	public bool TryGetBoxedByPath(
@@ -105,35 +151,6 @@ public partial class JsonFileCfgAccessor
 		ToolDict.SetValueByPath(CfgDict, Path, Value.Data);
 		return NIL;
 	}
-
-	[Impl]
-	public nil RmPath(IList<str> Path){
-		ToolDict.SetValueByPath(CfgDict, Path, NIL);
-		return NIL;
-	}
-
-	[Impl]
-	public nil Save(){
-		SaveAsy(default).Wait();
-		return NIL;
-	}
-
-
-	[Impl]
-	public async Task<nil> SaveAsy(CT Ct) {
-		BeforeSave?.Invoke(this, null!);
-		if(FnSaveAsy!=null){
-			return await FnSaveAsy(this, Ct);
-		}
-		await _SaveAsy(Ct);
-		AfterSave?.Invoke(this, null!);
-		return NIL;
-	}
-
-	public async Task<nil> _SaveAsy(CT Ct) {
-		var Json = ToolJson.DictToJson(CfgDict);
-		await File.WriteAllTextAsync(FilePath, Json, Ct);
-		return NIL;
-	}
+	#endregion Obslt
 }
 

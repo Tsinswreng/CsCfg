@@ -3,7 +3,7 @@ namespace Tsinswreng.CsCfg;
 public static class ExtnICfgItem{
 
 	public static T? GetFrom<T>(
-		this ICfgItem<T> Item //int? is not int
+		this ICfgNode<T> Item //int? is not int
 		,ICfgAccessor CfgAccessor
 	)
 	//where T: class
@@ -26,7 +26,7 @@ public static class ExtnICfgItem{
 	}
 
 	public static IList<str> GetFullPathSegs(
-		this ICfgItem Item
+		this ICfgNode Item
 	){
 		var Cur = Item;
 		var List2D = new List<IList<str>>();
@@ -46,15 +46,15 @@ public static class ExtnICfgItem{
 	}
 
 	public static str GetFullPath(
-		this ICfgItem z
-		,str Sep = CfgItem<nil>.PathSep
+		this ICfgNode z
+		,str Sep = CfgNode<nil>.PathSep
 	){
-		if(z._LazyFullPath is not null){
-			return z._LazyFullPath;
+		if(z._FullPathCache is not null){
+			return z._FullPathCache;
 		}
 		var Segs = z.GetFullPathSegs();
 		var R = string.Join(Sep, Segs);
-		z._LazyFullPath = R;
+		z._FullPathCache = R;
 		return R;
 	}
 
