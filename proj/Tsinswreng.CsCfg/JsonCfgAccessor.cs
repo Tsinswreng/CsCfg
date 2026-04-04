@@ -1,4 +1,4 @@
-#define Impl
+﻿#define Impl
 namespace Tsinswreng.CsCfg;
 using System.Collections;
 using Tsinswreng.CsCore;
@@ -25,7 +25,7 @@ public partial class JsonFileCfgAccessor
 		CfgDict = ToolJson.JsonStrToDict(JsonStr)??MkDict();
 		return this;
 	}
-	//勿用static 以適單例
+	// avoid static, keep fluent style
 	public async Task<JsonFileCfgAccessor> FromFileAsy(str FilePath, CT Ct){
 		var z = this;
 		z.FilePath = FilePath;
@@ -121,36 +121,4 @@ public partial class JsonFileCfgAccessor
 		await File.WriteAllTextAsync(FilePath, Json, Ct);
 		return NIL;
 	}
-	
-	#region Obslt
-
-	[Impl(typeof(ICfgAccessor))]
-	public bool TryGetBoxedByPath(
-		IList<str> Path
-		,out ICfgValue Got
-	){
-		if( ToolDict.TryGetValueByPath(CfgDict, Path, out var VObj) ){
-			Got = new CfgValue{Data=VObj};
-			return true;
-		}
-		Got = default!;
-		return false;
-	}
-
-
-	[Impl]
-	public ICfgValue? GetBoxedByPath(IList<str> Path){
-		if(this.TryGetBoxedByPath(Path, out var Got)){
-			return Got;
-		}
-		return null;
-	}
-
-	[Impl]
-	public nil SetBoxedByPathNonSave(IList<str> Path, ICfgValue Value){
-		ToolDict.SetValueByPath(CfgDict, Path, Value.Data);
-		return NIL;
-	}
-	#endregion Obslt
 }
-

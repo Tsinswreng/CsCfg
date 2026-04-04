@@ -1,14 +1,12 @@
-using Tsinswreng.CsCore;
+﻿using Tsinswreng.CsCore;
 
 namespace Tsinswreng.CsCfg;
 
 [Doc(@$"Dual Source Config Accessor")]
 public class DualSrcCfg:ICfgAccessor{
-	/// read only config
-	/// GetByPath旹更優先
+	[Doc("read only config")]
 	public ICfgAccessor? RoCfg{get;set;}
-	/// read write config
-	/// 用作用戶GUI配置
+	[Doc("read write config")]
 	public ICfgAccessor? RwCfg{get;set;}
 	public DualSrcCfg(){}
 	public DualSrcCfg(
@@ -20,34 +18,24 @@ public class DualSrcCfg:ICfgAccessor{
 	}
 
 	[Impl(typeof(ICfgAccessor))]
-	public bool TryGetBoxedByPath(
-		IList<str> Path
-		,out ICfgValue Got
-	){
-		if(RoCfg != null && RoCfg.TryGetBoxedByPath(Path, out Got)){
+	public bool TryGet(IList<str> Path, out obj? Got){
+		if(RoCfg != null && RoCfg.TryGet(Path, out Got)){
 			return true;
 		}
-		if(RwCfg != null && RwCfg.TryGetBoxedByPath(Path, out Got)){
+		if(RwCfg != null && RwCfg.TryGet(Path, out Got)){
 			return true;
 		}
-		Got = default!;
+		Got = default;
 		return false;
 	}
 
 	[Impl(typeof(ICfgAccessor))]
-	public ICfgValue? GetBoxedByPath(IList<str> Path){
-		if(this.TryGetBoxedByPath(Path, out var Got)){
-			return Got;
+	public bool TrySetNoSave(IList<str> Path, obj? V){
+		if(RwCfg == null){
+			return false;
 		}
-		return null;
+		return RwCfg.TrySetNoSave(Path, V);
 	}
-
-	[Impl(typeof(ICfgAccessor))]
-	public nil SetBoxedByPathNonSave(IList<str> Path, ICfgValue Value){
-		RwCfg?.SetBoxedByPathNonSave(Path, Value);
-		return NIL;
-	}
-	
 	
 	[Impl(typeof(ICfgAccessor))]
 	public nil RmPathNoSave(IList<str> Path){
@@ -76,7 +64,6 @@ public class DualSrcCfg:ICfgAccessor{
 	
 	[Impl(typeof(ICfgAccessor))]
 	public nil Save(){
-		//RoCfg.Save();
 		if(RwCfg != null){
 			RwCfg.Save();
 		}
@@ -84,11 +71,9 @@ public class DualSrcCfg:ICfgAccessor{
 	}
 	[Impl(typeof(ICfgAccessor))]
 	public async Task<nil> Save(CT Ct){
-		//await RoCfg.SaveAsy(Ct);
 		if(RwCfg != null){
 			await RwCfg.Save(Ct);
 		}
 		return NIL;
 	}
-
 }

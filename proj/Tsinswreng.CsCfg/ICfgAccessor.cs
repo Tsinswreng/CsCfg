@@ -1,5 +1,4 @@
-
-using Tsinswreng.CsCore;
+﻿using Tsinswreng.CsCore;
 
 namespace Tsinswreng.CsCfg;
 
@@ -23,21 +22,4 @@ public partial interface ICfgAccessor{
 	public nil Save();
 	
 	public Task<nil> Save(CT Ct);
-	
-#region Obslt
-	/// 無旹返null
-	[Obsolete]
-	public ICfgValue? GetBoxedByPath(IList<str> Path);
-
-	[Obsolete]
-	public bool TryGetBoxedByPath(
-		IList<str> Path
-		,out ICfgValue Got
-	);
-	/// 未必持久化
-	[Obsolete]
-	public nil SetBoxedByPathNonSave(IList<str> Path, ICfgValue Value);
-#endregion Obslt
 }
-
-

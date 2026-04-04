@@ -1,4 +1,4 @@
-namespace Tsinswreng.CsCfg;
+﻿namespace Tsinswreng.CsCfg;
 
 public static class ExtnICfgAccessor{
 	extension(ICfgAccessor z){
@@ -12,20 +12,17 @@ public static class ExtnICfgAccessor{
 
 	public static T? Get<T>(
 		this ICfgAccessor z
-		,ICfgNode<T> CfgItem
+		,ICfgNode<T> CfgNode
 	){
-		return CfgItem.GetFrom(z);
+		return CfgNode.GetFrom(z);
 	}
 
 	public static nil Set<T>(
 		this ICfgAccessor z
-		,ICfgNode CfgItem
+		,ICfgNode CfgNode
 		,T Value
 	){
-		z.SetBoxedByPathNonSave(
-			CfgItem.GetFullPathSegs()
-			,new CfgValue(){Type=typeof(T), Data=Value}
-		);
+		z.TrySetNoSave(CfgNode.GetFullPathSegs(), Value);
 		return NIL;
 	}
 }

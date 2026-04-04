@@ -1,34 +1,33 @@
-namespace Tsinswreng.CsCfg;
+﻿namespace Tsinswreng.CsCfg;
 
 public static class ExtnICfgItem{
 
 	public static T? GetFrom<T>(
-		this ICfgNode<T> Item //int? is not int
+		this ICfgNode<T> Node // `int?` is not `int`
 		,ICfgAccessor CfgAccessor
 	)
-	//where T: class
 	{
-		var Got = CfgAccessor.GetBoxedByPath(Item.GetFullPathSegs());
-		if(Got == null || Got.Data == null){
-			return (T?)Item.DfltValue?.Data;
+		if(!CfgAccessor.TryGet(Node.GetFullPathSegs(), out var Got) || Got == null){
+			return Node.DfltValue;
 		}
 
-		var TypeOfT = typeof(T);
-		if(!TypeOfT.IsValueType){
-			if(Got.Data is not T R){
-				throw new ArgumentException("Got.Data is not T: "+typeof(T));
-			}
-			return R;
-		}else{
-			//return (T?)Got.Data; i64轉i32會報錯
-			return (T)Convert.ChangeType(Got.Data, typeof(T));
+		if(Got is T Typed){
+			return Typed;
 		}
+
+		var TargetType = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
+		if(TargetType.IsValueType){
+			var Converted = Convert.ChangeType(Got, TargetType);
+			return (T)Converted;
+		}
+
+		throw new ArgumentException("Cfg value type mismatch: "+typeof(T));
 	}
 
 	public static IList<str> GetFullPathSegs(
-		this ICfgNode Item
+		this ICfgNode Node
 	){
-		var Cur = Item;
+		var Cur = Node;
 		var List2D = new List<IList<str>>();
 		for(;;){
 			if(Cur == null){break;}
@@ -57,7 +56,4 @@ public static class ExtnICfgItem{
 		z._FullPathCache = R;
 		return R;
 	}
-
-
-
 }
