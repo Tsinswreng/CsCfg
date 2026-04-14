@@ -64,12 +64,12 @@ public partial class JsonFileCfgAccessor
 		if(FnReLoadAsy != null){
 			return await FnReLoadAsy(this, Ct);
 		}
-		await _ReLoadAsy(Ct);
+		await _ReloadAsy(Ct);
 		AfterReLoad?.Invoke(this, null!);
 		return NIL;
 	}
 
-	public async Task<nil> _ReLoadAsy(CT Ct) {
+	public async Task<nil> _ReloadAsy(CT Ct) {
 		await FromFileAsy(FilePath, Ct);
 		return NIL;
 	}
@@ -111,12 +111,12 @@ public partial class JsonFileCfgAccessor
 		if(FnSaveAsy!=null){
 			return await FnSaveAsy(this, Ct);
 		}
-		await _SaveAsy(Ct);
+		await _Save(Ct);
 		AfterSave?.Invoke(this, null!);
 		return NIL;
 	}
 
-	public async Task<nil> _SaveAsy(CT Ct) {
+	public async Task<nil> _Save(CT Ct) {
 		var Json = ToolJson.DictToJson(CfgDict);
 		await File.WriteAllTextAsync(FilePath, Json, Ct);
 		return NIL;
