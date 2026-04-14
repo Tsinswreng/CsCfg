@@ -12,14 +12,14 @@ public partial interface ICfgAccessor{
 	public bool TrySetNoSave(IList<str> Path, obj? V);
 	
 	/// 未必持久化
-	public nil RmPathNoSave(IList<str> Path);
+	public bool RmPathNoSave(IList<str> Path);
 
-	public nil Reload();
+	public bool Reload();
 	
-	public Task<nil> Reload(CT Ct);
+	public Task<bool> Reload(CT Ct);
 
 	
-	public nil Save();
+	public bool Save();
 	
-	public Task<nil> Save(CT Ct);
+	public Task<bool> Save(CT Ct);
 }

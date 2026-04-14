@@ -17,8 +17,8 @@ public partial class JsonFileCfgAccessor
 #if Impl
 	= new Dictionary<str, object?>();
 #endif
-	public Func<JsonFileCfgAccessor, CT, Task<nil>>? FnReLoadAsy{get;set;}
-	public Func<JsonFileCfgAccessor, CT, Task<nil>>? FnSaveAsy{get;set;}
+	public Func<JsonFileCfgAccessor, CT, Task<bool>>? FnReLoadAsy{get;set;}
+	public Func<JsonFileCfgAccessor, CT, Task<bool>>? FnSaveAsy{get;set;}
 
 	IDictionary<str, obj?> MkDict()=> new Dictionary<str, obj?>();
 	public JsonFileCfgAccessor FromJson(str JsonStr){
@@ -53,25 +53,25 @@ public partial class JsonFileCfgAccessor
 
 
 	[Impl]
-	public nil Reload(){
-		Reload(default).Wait();
-		return NIL;
+	public bool Reload(){
+		var b = Reload(default).Result;
+		return b;
 	}
 
 	[Impl]
-	public async Task<nil> Reload(CT Ct) {
+	public async Task<bool> Reload(CT Ct) {
 		BeforeReLoad?.Invoke(this, null!);
 		if(FnReLoadAsy != null){
 			return await FnReLoadAsy(this, Ct);
 		}
 		await _ReloadAsy(Ct);
 		AfterReLoad?.Invoke(this, null!);
-		return NIL;
+		return true;
 	}
 
-	public async Task<nil> _ReloadAsy(CT Ct) {
+	public async Task<bool> _ReloadAsy(CT Ct) {
 		await FromFileAsy(FilePath, Ct);
-		return NIL;
+		return true;
 	}
 	
 	[Impl(typeof(ICfgAccessor))]
@@ -93,32 +93,32 @@ public partial class JsonFileCfgAccessor
 	
 
 	[Impl]
-	public nil RmPathNoSave(IList<str> Path){
+	public bool RmPathNoSave(IList<str> Path){
 		ToolDict.SetValueByPath(CfgDict, Path, NIL);
-		return NIL;
+		return true;
 	}
 
 	[Impl]
-	public nil Save(){
-		Save(default).Wait();
-		return NIL;
+	public bool Save(){
+		var b = Save(default).Result;
+		return b;
 	}
 
 
 	[Impl]
-	public async Task<nil> Save(CT Ct) {
+	public async Task<bool> Save(CT Ct) {
 		BeforeSave?.Invoke(this, null!);
 		if(FnSaveAsy!=null){
 			return await FnSaveAsy(this, Ct);
 		}
-		await _Save(Ct);
+		var b = await _Save(Ct);
 		AfterSave?.Invoke(this, null!);
-		return NIL;
+		return b;
 	}
 
-	public async Task<nil> _Save(CT Ct) {
+	public async Task<bool> _Save(CT Ct) {
 		var Json = ToolJson.DictToJson(CfgDict);
 		await File.WriteAllTextAsync(FilePath, Json, Ct);
-		return NIL;
+		return true;
 	}
 }

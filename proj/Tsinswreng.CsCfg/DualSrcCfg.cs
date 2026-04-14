@@ -38,42 +38,46 @@ public class DualSrcCfg:ICfgAccessor{
 	}
 	
 	[Impl(typeof(ICfgAccessor))]
-	public nil RmPathNoSave(IList<str> Path){
-		RwCfg?.RmPathNoSave(Path);
-		return NIL;
+	public bool RmPathNoSave(IList<str> Path){
+		var b = RwCfg?.RmPathNoSave(Path);
+		if(b == false){return false;}
+		return true;
 	}
 	
 	[Impl(typeof(ICfgAccessor))]
-	public nil Reload(){
-		RoCfg?.Reload();
-		RwCfg?.Reload();
-		return NIL;
+	public bool Reload(){
+		var b1 = RoCfg?.Reload();
+		var b2 = RwCfg?.Reload();
+		if(b1 == false || b2 == false){
+			return false;
+		}
+		return true;
 	}
 
 	[Impl(typeof(ICfgAccessor))]
-	public async Task<nil> Reload(CT Ct){
-		if(RoCfg != null){
-			await RoCfg.Reload(Ct);
+	public async Task<bool> Reload(CT Ct){
+		if(RoCfg is not null){
+			return await RoCfg.Reload(Ct);
 		}
-		if(RwCfg != null){
-			await RwCfg.Reload(Ct);
+		if(RwCfg is not null){
+			return await RwCfg.Reload(Ct);
 		}
-		return NIL;
+		return true;
 	}
 	
 	
 	[Impl(typeof(ICfgAccessor))]
-	public nil Save(){
-		if(RwCfg != null){
-			RwCfg.Save();
+	public bool Save(){
+		if(RwCfg is not null){
+			return RwCfg.Save();
 		}
-		return NIL;
+		return true;
 	}
 	[Impl(typeof(ICfgAccessor))]
-	public async Task<nil> Save(CT Ct){
-		if(RwCfg != null){
-			await RwCfg.Save(Ct);
+	public async Task<bool> Save(CT Ct){
+		if(RwCfg is not null){
+			return await RwCfg.Save(Ct);
 		}
-		return NIL;
+		return true;
 	}
 }
