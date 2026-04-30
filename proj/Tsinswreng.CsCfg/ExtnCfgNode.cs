@@ -1,7 +1,6 @@
 ﻿namespace Tsinswreng.CsCfg;
 
-public static class ExtnICfgItem{
-
+public static class ExtnCfgNode{
 	public static T? GetFrom<T>(
 		this ICfgNode<T> Node // `int?` is not `int`
 		,ICfgAccessor CfgAccessor
