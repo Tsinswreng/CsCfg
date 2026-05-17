@@ -1,12 +1,11 @@
-#import "@preview/tsinswreng-auto-heading:0.1.0": auto-heading
-#let H = auto-heading;
+## CfCfg
 
-= CfCfg
-Configuration system for C\#
+Configuration system for C#
 
-= Usage
+## Usage
 
-+ prepare your config source file e.g: `App.dev.json`
+1. prepare your config source file e.g: `App.dev.json`
+
 ```json
 {
 	"SqlitePath": "./App.dev.sqlite"
@@ -21,10 +20,9 @@ Configuration system for C\#
 	,"ServerBaseUrl": "http://localhost:5000/"
 }
 ```
-+ Create your config accessor class
+
+1. Create your config accessor class
 
 ```bash
 dotnet add package Tsinswreng.CsCfg --version 0.0.1-alpha
 ```
-
-
