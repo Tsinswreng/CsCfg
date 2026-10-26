@@ -12,7 +12,7 @@ public partial class JsonFileCfgAccessor
 	[Doc(@$"Json File Path")]
 	public str FilePath{get;set;} = "";
 
-	[Impl]
+	[BeaKona.AutoInterface(IncludeBaseInterfaces =true)]
 	public IDictionary<str, object?> CfgDict{get;set;}
 #if Impl
 	= new Dictionary<str, object?>();
@@ -26,7 +26,7 @@ public partial class JsonFileCfgAccessor
 		return this;
 	}
 	// avoid static, keep fluent style
-	public async Task<JsonFileCfgAccessor> FromFileAsy(str FilePath, CT Ct){
+	public async Task<JsonFileCfgAccessor> FromFile(str FilePath, CT Ct){
 		var z = this;
 		z.FilePath = FilePath;
 		var JsonStr = await File.ReadAllTextAsync(FilePath, Ct);
@@ -70,7 +70,7 @@ public partial class JsonFileCfgAccessor
 	}
 
 	public async Task<bool> _ReloadAsy(CT Ct) {
-		await FromFileAsy(FilePath, Ct);
+		await FromFile(FilePath, Ct);
 		return true;
 	}
 	

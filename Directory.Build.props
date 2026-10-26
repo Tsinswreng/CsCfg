@@ -7,6 +7,7 @@
 		<PublishAot>true</PublishAot>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="BeaKona.AutoInterfaceGenerator" Version="1.0.46" />
 		<ProjectReference Include="../../../Tsinswreng.CsKeyNode/proj/Tsinswreng.CsKeyNode/Tsinswreng.CsKeyNode.csproj" />
 	</ItemGroup>
 </Project>
