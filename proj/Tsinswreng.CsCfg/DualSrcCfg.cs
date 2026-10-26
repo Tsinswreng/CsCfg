@@ -3,7 +3,10 @@
 namespace Tsinswreng.CsCfg;
 
 [Doc(@$"Dual Source Config Accessor")]
-public class DualSrcCfg:ICfgAccessor{
+public class DualSrcCfg
+	:IDualSrcCfg
+	,ICfgAccessor
+{
 	[Doc("read only config")]
 	public ICfgAccessor? RoCfg{get;set;}
 	[Doc("read write config")]
