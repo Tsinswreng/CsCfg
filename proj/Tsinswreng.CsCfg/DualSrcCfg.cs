@@ -4,7 +4,7 @@ namespace Tsinswreng.CsCfg;
 
 [Doc(@$"Dual Source Config Accessor")]
 public class DualSrcCfg
-	:IDualSrcCfg
+	:IDualSrcCfgAccessor
 	,ICfgAccessor
 {
 	[Doc("read only config")]
