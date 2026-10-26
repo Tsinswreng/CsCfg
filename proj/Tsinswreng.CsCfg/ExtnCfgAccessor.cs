@@ -1,6 +1,6 @@
 ﻿namespace Tsinswreng.CsCfg;
 using Tsinswreng.CsKeyNode;
-public static class ExtnICfgAccessor{
+public static class ICfgAccessorExtn{
 	extension(ICfgAccessor z){
 
 	}
