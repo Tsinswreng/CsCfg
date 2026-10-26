@@ -7,7 +7,7 @@ using Tsinswreng.CsTools;
 public partial class JsonFileCfgAccessor
 	:ICfgAccessor
 	,ICfgEvents
-	,I_CfgDict
+	,ICfgDict
 {
 	[Doc(@$"Json File Path")]
 	public str FilePath{get;set;} = "";
