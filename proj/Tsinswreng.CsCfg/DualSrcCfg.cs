@@ -18,7 +18,7 @@ public class DualSrcCfg:ICfgAccessor{
 	}
 
 	[Impl(typeof(ICfgAccessor))]
-	public bool TryGet(IList<str> Path, out obj? Got){
+	public bool TryGet(IReadOnlyList<str> Path, out obj? Got){
 		if(RoCfg != null && RoCfg.TryGet(Path, out Got)){
 			return true;
 		}
@@ -30,7 +30,7 @@ public class DualSrcCfg:ICfgAccessor{
 	}
 
 	[Impl(typeof(ICfgAccessor))]
-	public bool TrySetNoSave(IList<str> Path, obj? V){
+	public bool TrySetNoSave(IReadOnlyList<str> Path, obj? V){
 		if(RwCfg == null){
 			return false;
 		}
@@ -38,7 +38,7 @@ public class DualSrcCfg:ICfgAccessor{
 	}
 	
 	[Impl(typeof(ICfgAccessor))]
-	public bool RmPathNoSave(IList<str> Path){
+	public bool RmPathNoSave(IReadOnlyList<str> Path){
 		var b = RwCfg?.RmPathNoSave(Path);
 		if(b == false){return false;}
 		return true;

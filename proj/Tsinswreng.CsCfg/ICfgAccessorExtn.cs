@@ -5,12 +5,18 @@ public static class ICfgAccessorExtn{
 
 	}
 	
-	static T? GetFrom<T>(
-		this IKeyNode<T> Node // `int?` is not `int`
-		,ICfgAccessor CfgAccessor
-	)
-	{
-		if(!CfgAccessor.TryGet(Node.FullPathSegs, out var Got) || Got == null){
+	public static Func<IKeyNode<T>, T?> MkFnGet<T>(this ICfgAccessor z){
+		return (CfgNode)=>{
+			return z.Get(CfgNode);
+		};
+	}
+
+	public static T Get<T>(
+		this ICfgAccessor z
+		,IKeyNode<T> CfgNode
+	){
+		var Node = CfgNode;
+		if(!z.TryGet(Node.FullPathSegs, out var Got) || Got == null){
 			return Node.Data;
 		}
 
@@ -26,21 +32,8 @@ public static class ICfgAccessorExtn{
 
 		throw new ArgumentException("Cfg value type mismatch: "+typeof(T));
 	}
-	
-	public static Func<IKeyNode<T>, T?> MkFnGet<T>(this ICfgAccessor z){
-		return (CfgItem)=>{
-			return CfgItem.GetFrom(z);
-		};
-	}
 
-	public static T? Get<T>(
-		this ICfgAccessor z
-		,IKeyNode<T> CfgNode
-	){
-		return CfgNode.GetFrom(z);
-	}
-
-	public static nil Set<T>(
+	public static nil SetNoSave<T>(
 		this ICfgAccessor z
 		,IKeyNode CfgNode
 		,T Value
