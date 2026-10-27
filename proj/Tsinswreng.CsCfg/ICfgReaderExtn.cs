@@ -2,7 +2,12 @@ namespace Tsinswreng.CsCfg;
 using System.Globalization;
 using Tsinswreng.CsKeyNode;
 public static class ICfgReaderExtn{
-	
+
+	public static Func<IKeyNode<T>, T> MkFnGet<T>(this ICfgReader z){
+		return (CfgNode)=>{
+			return z.Get(CfgNode);
+		};
+	}
 	
 	public static bool TryGet(
 		this ICfgReader z, IKeyNode KeyNode, out obj? Got
@@ -11,40 +16,33 @@ public static class ICfgReaderExtn{
 		return z.TryGet(KeyNode.FullPathSegs, out Got);
 	}
 	
-	
-	public static Func<IKeyNode<T>, T> MkFnGet<T>(this ICfgReader z){
-		return (CfgNode)=>{
-			return z.Get(CfgNode);
-		};
+	/// 型別化取值：T 由鍵的靜態型別推斷，取到後按值模型轉型。
+	/// 回 false 有兩種情形：沒有這個鍵，或值轉不成 T；
+	/// 要區分這兩者，先用收 IKeyNode 的裸值版 TryGet 看存在性，型別由調用方自己判。
+	public static bool TryGet<T>(
+		this ICfgReader z, IKeyNode<T> KeyNode, out T Value
+	){
+		Value = default!;
+		if(!z.TryGet(KeyNode.FullPathSegs, out var Got)){
+			return false;
+		}
+		// 顯式設成 null 視為取到了值，Value 取 T 的默認值，不回鍵的默認值
+		if(Got is null){
+			return true;
+		}
+		return TryCoerce(Got, out Value);
 	}
 
+	/// 按鍵取值：沒有這個鍵就回鍵上宣告的默認值；顯式設成 null 則回 T 的默認值。
+	/// 存在性與轉型全交給 TryGet，本函數只負責兜底。
 	public static T Get<T>(
 		this ICfgReader z
 		,IKeyNode<T> CfgNode
 	){
-		var Node = CfgNode;
-		if(!z.TryGet(Node.FullPathSegs, out var Got)){
-			return Node.Data;
+		if(!z.TryGet(CfgNode, out T Value)){
+			return CfgNode.Data;
 		}
-		
-		//顯式設置成null的返null 不用默認值
-		if(Got is null){
-			return default!;
-		}
-
-		if(Got is T Typed){
-			return Typed;
-		}
-
-		// 值模型只認標量(str/整數族/f32/f64/decimal/bool)與 null。
-		// 一律先化成 invariant 字符串再按目標型別 TryParse, 所以「1.5 給 i32」
-		// 不論原本寫成數字還是字符串, 都會被判成壞值, 不會一邊拋一邊四捨五入。
-		if(!TryCoerce(Got, out T V)){
-			throw new ArgumentException(
-				$"配置值型別不符: 鍵 {Node.BuildFullPath()} 期望 {typeof(T).Name}, 實際 {Got.GetType().Name}"
-			);
-		}
-		return V;
+		return Value;
 	}
 
 	/// 把配置裡取到的裸值轉成 T。
