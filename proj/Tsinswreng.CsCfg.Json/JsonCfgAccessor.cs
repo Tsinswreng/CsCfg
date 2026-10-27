@@ -2,7 +2,7 @@
 namespace Tsinswreng.CsCfg;
 using System.Collections;
 using Tsinswreng.CsCore;
-using Tsinswreng.CsTools;
+using Tsinswreng.CsJson;
 
 public partial class JsonFileCfgAccessor
 	:ICfgAccessor

@@ -13,9 +13,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="../TypeAlias.cs" />
-		<!-- <ProjectReference Include="../../../Tsinswreng.CsTools/proj/Tsinswreng.CsTools/Tsinswreng.CsTools.csproj" /> -->
-		<PackageReference Include="Tsinswreng.CsTools" Version="0.0.1-alpha" />
+		
 	</ItemGroup>
 
 	<ItemGroup>

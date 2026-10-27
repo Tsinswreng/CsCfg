@@ -8,9 +8,9 @@ public partial interface ICfgAccessor:ICfgReader{
 
 	public bool TrySetNoSave(IReadOnlyList<str> Path, obj? V);
 	
-	public bool RmPathNoSave(IReadOnlyList<str> Path);
+	public void RmPathNoSave(IReadOnlyList<str> Path);
 
-	public bool Save();
+	public void Save();
 	
-	public Task<bool> Save(CT Ct);
+	public Task<nil> Save(CT Ct);
 }
