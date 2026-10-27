@@ -8,7 +8,7 @@ public class DualSrcCfgAccessor
 	,ICfgAccessor
 {
 	[Doc("read only config")]
-	public ICfgAccessor? RoCfg{get;set;}
+	public ICfgReader? RoCfg{get;set;}
 	[Doc("read write config")]
 	public ICfgAccessor? RwCfg{get;set;}
 	public DualSrcCfgAccessor(){}
@@ -48,24 +48,20 @@ public class DualSrcCfgAccessor
 	}
 	
 	[Impl(typeof(ICfgAccessor))]
-	public bool Reload(){
-		var b1 = RoCfg?.Reload();
-		var b2 = RwCfg?.Reload();
-		if(b1 == false || b2 == false){
-			return false;
-		}
-		return true;
+	public void Reload(){
+		RoCfg?.Reload();
+		RwCfg?.Reload();
 	}
 
 	[Impl(typeof(ICfgAccessor))]
-	public async Task<bool> Reload(CT Ct){
+	public async Task<nil> Reload(CT Ct){
 		if(RoCfg is not null){
 			return await RoCfg.Reload(Ct);
 		}
 		if(RwCfg is not null){
 			return await RwCfg.Reload(Ct);
 		}
-		return true;
+		return NIL;
 	}
 	
 	

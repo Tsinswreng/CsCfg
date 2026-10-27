@@ -10,8 +10,8 @@ public partial interface ICfgReader{
 	);
 	
 	
-	public bool Reload();
+	public void Reload();
 	
-	public Task<bool> Reload(CT Ct);
+	public Task<nil> Reload(CT Ct);
 	
 }

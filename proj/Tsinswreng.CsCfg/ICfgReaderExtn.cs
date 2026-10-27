@@ -11,7 +11,7 @@ public static class ICfgReaderExtn{
 	}
 	
 	
-	public static Func<IKeyNode<T>, T?> MkFnGet<T>(this ICfgReader z){
+	public static Func<IKeyNode<T>, T> MkFnGet<T>(this ICfgReader z){
 		return (CfgNode)=>{
 			return z.Get(CfgNode);
 		};
@@ -22,8 +22,13 @@ public static class ICfgReaderExtn{
 		,IKeyNode<T> CfgNode
 	){
 		var Node = CfgNode;
-		if(!z.TryGet(Node.FullPathSegs, out var Got) || Got == null){
+		if(!z.TryGet(Node.FullPathSegs, out var Got)){
 			return Node.Data;
+		}
+		
+		//顯式設置成null的返null 不用默認值
+		if(Got is null){
+			return default!;
 		}
 
 		if(Got is T Typed){
