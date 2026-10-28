@@ -23,31 +23,21 @@ public class LayeredCfgAccessor : ILayeredCfgAccessor{
 	[Doc(@$"
 	依 Srcs 的順序取第一個命中的源。
 	命中即停, 即使值是 null: null 也是值, 上層寫了 null 就是明確遮蔽下層。
+	Src 往外吐的是最內層的提供者: 若某個源本身又是聚合層, 它會回報自己的源。
 	")]
-	public bool TryGet(IReadOnlyList<str> Path, out obj? Got){
-		foreach(var Src in Srcs){
-			if(Src is null){
+	public bool TryGet(IReadOnlyList<str> Path, out obj? Got, out ICfgReader? Src){
+		foreach(var One in Srcs){
+			if(One is null){
 				continue;
 			}
-			if(Src.TryGet(Path, out Got)){
+			if(One.TryGet(Path, out Got, out var Hit)){
+				Src = Hit ?? One;
 				return true;
 			}
 		}
 		Got = null;
+		Src = null;
 		return false;
-	}
-
-	[Doc(@$"回第一個命中的源; 全部沒有回 null。走法與 {nameof(TryGet)} 一致。")]
-	public ICfgReader? ReaderOf(IReadOnlyList<str> Path){
-		foreach(var Src in Srcs){
-			if(Src is null){
-				continue;
-			}
-			if(Src.TryGet(Path, out _)){
-				return Src;
-			}
-		}
-		return null;
 	}
 
 	[Doc(@$"寫入只落可寫源; 沒有可寫源就回 false。")]

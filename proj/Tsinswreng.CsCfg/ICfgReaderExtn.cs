@@ -13,8 +13,16 @@ public static class ICfgReaderExtn{
 		this ICfgReader z, IKeyNode KeyNode, out obj? Got
 	){
 		
-		return z.TryGet(KeyNode.FullPathSegs, out Got);
+		return z.TryGet(KeyNode.FullPathSegs, out Got, out _);
 	}
+
+	/// 只要值、不要來源的寫法。來源用三參數版 TryGet 拿。
+	public static bool TryGet(
+		this ICfgReader z, IReadOnlyList<str> Path, out obj? Got
+	){
+		return z.TryGet(Path, out Got, out _);
+	}
+
 	
 	/// 型別化取值：T 由鍵的靜態型別推斷，取到後按值模型轉型。
 	/// 回 false 有兩種情形：沒有這個鍵，或值轉不成 T；

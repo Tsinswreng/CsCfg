@@ -13,21 +13,17 @@ public partial interface ICfgReader{
 	public str Name{get;set;}
 
 	[Doc(@$"
-	按路徑取值。
-	路徑為空、中途某段不是字典、或最後一段的鍵不存在, 都回 false;
-	回 true 時值可以是 null, 那表示明確設成了 null。
+	按路徑取值, 並同時說出這個值是哪個讀者提供的。
+
+	路徑為空、中途某段不是字典、或最後一段的鍵不存在, 都回 false; 此時 Got 與 Src 皆為 null。
+	回 true 時 Got 可以是 null, 那表示明確設成了 null, 而 Src 一定非 null。
+
+	把來源與值放在同一次調用, 是為了避免兩次遍歷之間被 Reload 打斷,
+	出現「值來自新源、來源回舊源」這種矛盾。
 	")]
 	public bool TryGet(
-		IReadOnlyList<str> Path, out obj? Got
+		IReadOnlyList<str> Path, out obj? Got, out ICfgReader? Src
 	);
-
-	[Doc(@$"
-	這個鍵由哪個讀者提供; 沒命中回 null。
-	默認實現把自己當唯一的來源; 多源聚合層要覆寫成按優先級逐個問。
-	")]
-	public ICfgReader? ReaderOf(IReadOnlyList<str> Path){
-		return TryGet(Path, out _) ? this : null;
-	}
 
 	[Doc(@$"整體重讀。失敗時拋異常, 舊值保留。")]
 	public void Reload();

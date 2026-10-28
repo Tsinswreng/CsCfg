@@ -59,17 +59,17 @@ public class DictCfgReader : ICfgReader{
 	}
 
 	[Doc(@$"
-	按路徑取值。
-	路徑為空、中途某段不是字典、或最後一段的鍵不存在, 都回 false;
-	回 true 時值可以是 null, 那表示明確設成了 null。
+	按路徑取值。命中時 Src 就是自己: 單源讀者沒有別人可以提供這個值。
+	路徑為空、中途某段不是字典、或最後一段的鍵不存在, 都回 false, 此時 Got 與 Src 皆為 null。
+	回 true 時 Got 可以是 null, 那表示明確設成了 null。
 	")]
-	public bool TryGet(IReadOnlyList<str> Path, out obj? Got){
-		return DictCfgAccessor.TryGetByPath(Dict, Path, out Got);
-	}
-
-	[Doc(@$"單源讀者: 命中就是自己提供了值, 沒命中回 null。")]
-	public ICfgReader? ReaderOf(IReadOnlyList<str> Path){
-		return TryGet(Path, out _) ? this : null;
+	public bool TryGet(IReadOnlyList<str> Path, out obj? Got, out ICfgReader? Src){
+		if(DictCfgAccessor.TryGetByPath(Dict, Path, out Got)){
+			Src = this;
+			return true;
+		}
+		Src = null;
+		return false;
 	}
 	
 }
