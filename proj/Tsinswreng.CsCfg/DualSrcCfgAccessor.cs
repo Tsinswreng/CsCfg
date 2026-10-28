@@ -66,17 +66,17 @@ public class DualSrcCfgAccessor
 	
 	
 	[Impl(typeof(ICfgAccessor))]
-	public bool Save(){
+	public void Save(){
 		if(RwCfg is not null){
-			return RwCfg.Save();
+			RwCfg.Save();
 		}
-		return true;
 	}
+	
 	[Impl(typeof(ICfgAccessor))]
-	public async Task<bool> Save(CT Ct){
+	public async Task<nil> Save(CT Ct){
 		if(RwCfg is not null){
 			return await RwCfg.Save(Ct);
 		}
-		return true;
+		return NIL;
 	}
 }
