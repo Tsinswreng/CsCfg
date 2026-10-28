@@ -60,12 +60,12 @@ public partial class JsonFileCfgAccessor
 
 	[Impl]
 	public async Task<bool> Reload(CT Ct) {
-		BeforeReLoad?.Invoke(this, null!);
+		BeforeReload?.Invoke(this, new CfgChange(this));
 		if(FnReLoadAsy != null){
 			return await FnReLoadAsy(this, Ct);
 		}
 		await _ReloadAsy(Ct);
-		AfterReLoad?.Invoke(this, null!);
+		AfterReload?.Invoke(this, new CfgChange(this));
 		return true;
 	}
 
@@ -110,12 +110,12 @@ public partial class JsonFileCfgAccessor
 
 	[Impl]
 	public async Task<bool> Save(CT Ct) {
-		BeforeSave?.Invoke(this, null!);
+		BeforeSave?.Invoke(this, new CfgChange(this));
 		if(FnSaveAsy!=null){
 			return await FnSaveAsy(this, Ct);
 		}
 		var b = await _Save(Ct);
-		AfterSave?.Invoke(this, null!);
+		AfterSave?.Invoke(this, new CfgChange(this));
 		return b;
 	}
 

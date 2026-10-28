@@ -20,9 +20,15 @@ public class DictCfgAccessor : DictCfgReader, ICfgAccessor{
 	[Doc(@$"
 	按路徑寫值, 只改內存。
 	缺中間節點就按 {nameof(MkDict)} 補; 中間節點存在但不是字典時回 false 且不改動任何東西。
+	Before 會照樣觸發(確實嘗試過了), After 只在真的寫成功時觸發。
 	")]
 	public bool TrySetNoSave(IReadOnlyList<str> Path, obj? V){
-		return TrySetByPath(Dict, Path, V, MkDict);
+		OnBeforeSet(new CfgChange(this, Path));
+		var Ok = TrySetByPath(Dict, Path, V, MkDict);
+		if(Ok){
+			OnAfterSet(new CfgChange(this, Path));
+		}
+		return Ok;
 	}
 
 	[Doc(@$"
@@ -30,25 +36,36 @@ public class DictCfgAccessor : DictCfgReader, ICfgAccessor{
 	刪完會由內而外清掉留下的空字典, 根不清理。
 	回 true 表示這棵樹真的被改動了; 回 false 表示什麼都沒刪, 可能是鍵不存在、
 	中途某段缺失、中途某段不是字典、或路徑為空。
+	After 只在真的刪掉一個鍵時觸發: 什麼都沒刪就不算變更。
 	")]
 	public bool RmPathNoSave(IReadOnlyList<str> Path){
-		return RmByPath(Dict, Path);
+		OnBeforeRm(new CfgChange(this, Path));
+		var Ok = RmByPath(Dict, Path);
+		if(Ok){
+			OnAfterRm(new CfgChange(this, Path));
+		}
+		return Ok;
 	}
 
-	[Doc(@$"把整棵配置樹交給 {nameof(FnSave)}。")]
+	[Doc(@$"把整棵配置樹交給 {nameof(FnSave)}。失敗時不觸發 After。")]
 	public void Save(){
 		if(FnSave is null){
 			throw new InvalidOperationException($"{nameof(FnSave)} is not set. Assign a save target before calling {nameof(Save)}.");
 		}
+		OnBeforeSave(new CfgChange(this));
 		FnSave(Dict);
+		OnAfterSave(new CfgChange(this));
 	}
 
-	[Doc(@$"把整棵配置樹交給 {nameof(FnSaveAsy)}。")]
+	[Doc(@$"把整棵配置樹交給 {nameof(FnSaveAsy)}。失敗時不觸發 After。")]
 	public async Task<nil> Save(CT Ct){
 		if(FnSaveAsy is null){
 			throw new InvalidOperationException($"{nameof(FnSaveAsy)} is not set. Assign a save target before calling {nameof(Save)}.");
 		}
-		return await FnSaveAsy(Dict);
+		OnBeforeSave(new CfgChange(this));
+		var R = await FnSaveAsy(Dict);
+		OnAfterSave(new CfgChange(this));
+		return R;
 	}
 	
 	

@@ -1,15 +1,13 @@
 namespace Tsinswreng.CsCfg;
 public partial class JsonFileCfgAccessor:ICfgEvents{
-	public event EventHandler? BeforeGetByPath;
-	public event EventHandler? BeforeSetByPath;
-	public event EventHandler? BeforeRmPath;
-	public event EventHandler? BeforeReLoad;
-	public event EventHandler? BeforeSave;
+	public event EventHandler<ICfgChange>? BeforeSetByPath;
+	public event EventHandler<ICfgChange>? BeforeRmPath;
+	public event EventHandler<ICfgChange>? BeforeReload;
+	public event EventHandler<ICfgChange>? BeforeSave;
 
-	public event EventHandler? AfterGetByPath;
-	public event EventHandler? AfterSetByPath;
-	public event EventHandler? AfterRmPath;
-	public event EventHandler? AfterReLoad;
-	public event EventHandler? AfterSave;
+	public event EventHandler<ICfgChange>? AfterSetByPath;
+	public event EventHandler<ICfgChange>? AfterRmPath;
+	public event EventHandler<ICfgChange>? AfterReload;
+	public event EventHandler<ICfgChange>? AfterSave;
 
 }
