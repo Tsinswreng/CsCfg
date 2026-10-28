@@ -17,6 +17,12 @@ using Tsinswreng.CsCore;
 """)]
 public class DictCfgReader : ICfgReader{
 
+	[Doc(@$"
+	本源的技術標識, 例如 `file`、`gui`、`defaults`。
+	多源裝配時它就是界面顯示「由誰接管」的依據, 故同一組源裡必須唯一。
+	")]
+	public str Name{get;set;} = "dict";
+
 	[Doc(@$"配置樹的根。由 codec 解出; {nameof(Reload)} 重讀時整體替換。")]
 	public IDictionary<str, obj?> Dict{get;set;} = new OrderedDictionary<str, obj?>();
 
@@ -61,7 +67,9 @@ public class DictCfgReader : ICfgReader{
 		return DictCfgAccessor.TryGetByPath(Dict, Path, out Got);
 	}
 
-	// ===== 以下三個是路徑與嵌套字典的操作, 本類自備, 不依賴任何工具庫 =====
-
+	[Doc(@$"單源讀者: 命中就是自己提供了值, 沒命中回 null。")]
+	public ICfgReader? ReaderOf(IReadOnlyList<str> Path){
+		return TryGet(Path, out _) ? this : null;
+	}
 	
 }
