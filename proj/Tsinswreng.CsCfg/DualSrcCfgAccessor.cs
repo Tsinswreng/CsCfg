@@ -1,4 +1,4 @@
-﻿using Tsinswreng.CsCore;
+using Tsinswreng.CsCore;
 
 namespace Tsinswreng.CsCfg;
 
@@ -42,9 +42,11 @@ public class DualSrcCfgAccessor
 	
 	[Impl(typeof(ICfgAccessor))]
 	public bool RmPathNoSave(IReadOnlyList<str> Path){
-		var b = RwCfg?.RmPathNoSave(Path);
-		if(b == false){return false;}
-		return true;
+		// 只有可寫的那份能刪; 沒有可寫源就代表什麼都沒改動
+		if(RwCfg is null){
+			return false;
+		}
+		return RwCfg.RmPathNoSave(Path);
 	}
 	
 	[Impl(typeof(ICfgAccessor))]
