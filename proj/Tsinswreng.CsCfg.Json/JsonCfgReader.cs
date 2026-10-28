@@ -1,46 +1,36 @@
-using Tsinswreng.CsJson;
-
 namespace Tsinswreng.CsCfg.Json;
 
-public class JsonCfgReader : DictCfgReader {
-	public IJsonSerializerCore JsonSerializer{get;set;} = CsJson.JsonSerializer.Inst;
-	public Stream JsonStreamUtf8{get;set;}
-	public JsonCfgReader(
-		Stream JsonStreamReaderUtf8
-	){
-		this.JsonStreamUtf8 = JsonStreamReaderUtf8;
-		Init();
-	}
-	
-	void Init(){
-		var s = JsonSerializer;
-		var GotDict = s.Deserialize<IDictionary<str, obj?>>(JsonStreamUtf8, s.Options);
-		this.Dict = GotDict??this.Dict;
-	}
-}
+using System.Text.Json;
+using Tsinswreng.CsCore;
 
-public class JsonCfgAccessor: JsonCfgReader, ICfgAccessor{
-	public Stream JsonStreamWriterUtf8{get;set;}
-	public JsonCfgAccessor(
-		Stream JsonStreamReaderUtf8,
-		Stream JsonStreamWriterUtf8
-	):base(JsonStreamReaderUtf8){
-		this.JsonStreamWriterUtf8 = JsonStreamWriterUtf8;
-	}
+[Doc("""
+從 UTF-8 JSON 流讀配置的源, 只讀。
 
-	public bool TrySetNoSave(IReadOnlyList<string> Path, object? V) {
-		throw new NotImplementedException();
-	}
+*流的所有權*: 本類不關閉 `InputStream`; 用完由調用方負責。
+*重讀*: 每次重讀都回到流的開頭, 所以流必須可 Seek; 不可 Seek 的流只有第一次讀得到。
+*根形狀*: JSON 根必須是對象, 否則拋; 數組或標量沒辦法用路徑尋址。
+""")]
+public partial class JsonCfgReader : DictCfgReader{
 
-	public bool RmPathNoSave(IReadOnlyList<string> Path) {
-		throw new NotImplementedException();
-	}
+	[Doc(@$"讀的那份流; 沒設就沒有來源。")]
+	public Stream? InputStream{get;set;}
 
-	public bool Save() {
-		throw new NotImplementedException();
-	}
+	[Doc(@$"解析選項。默認允許註釋與尾逗號, 因為出廠配置是人手寫的。")]
+	public JsonDocumentOptions DocOpts{get;set;} = new(){
+		CommentHandling = JsonCommentHandling.Skip
+		,AllowTrailingCommas = true
+	};
 
-	public Task<bool> Save(CT Ct) {
-		throw new NotImplementedException();
-	}
+	[Doc("""
+	#Prm[InputStream][讀的那份流; 可以傳 null, 之後再設並呼叫 Reload。]
+	#Prm[Name][源的技術標識。]
+	構造後立刻載入一次; 載入失敗會拋。
+	""")]
+	public partial JsonCfgReader(Stream? InputStream, str Name = "json");
+
+	[Doc(@$"立刻讀一次, 不觸發事件; 失敗拋。回傳解析結果, 同時寫進 {nameof(Dict)}。要事件就走 {nameof(Reload)}。")]
+	public partial IDictionary<str, obj?> Load();
+
+	[Doc(@$"立刻讀一次(異步), 不觸發事件; 失敗拋。回傳解析結果, 同時寫進 {nameof(Dict)}。")]
+	public partial Task<IDictionary<str, obj?>> Load(CT Ct);
 }

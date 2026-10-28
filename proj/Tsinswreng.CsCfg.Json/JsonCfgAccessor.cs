@@ -1,127 +1,55 @@
-#define Impl
-namespace Tsinswreng.CsCfg;
-using System.Collections;
+namespace Tsinswreng.CsCfg.Json;
+
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using Tsinswreng.CsCore;
-using Tsinswreng.CsJson;
 
-public partial class JsonFileCfgAccessor
-	:ICfgAccessor
-	,ICfgEvents
-	,ICfgDict
-{
-	[Doc(@$"Json File Path")]
-	public str FilePath{get;set;} = "";
+[Doc("""
+從 UTF-8 JSON 流讀寫配置的源。
 
-	[BeaKona.AutoInterface(IncludeBaseInterfaces =true)]
-	public IDictionary<str, object?> CfgDict{get;set;}
-#if Impl
-	= new Dictionary<str, object?>();
-#endif
-	public Func<JsonFileCfgAccessor, CT, Task<bool>>? FnReLoadAsy{get;set;}
-	public Func<JsonFileCfgAccessor, CT, Task<bool>>? FnSaveAsy{get;set;}
+*兩條流*: `InputStream` 讀, `OutputStream` 寫; 兩者都不由本類關閉。
+寫的時候整份重寫, 所以輸出流裡的鍵序就是 `Dict` 的鍵序, 註釋與原排版不會保留。
+這是刻意的: 能被程序重寫的那份配置本來就不該放註釋, 手寫那份要保持原樣就得另存一個源。
 
-	IDictionary<str, obj?> MkDict()=> new Dictionary<str, obj?>();
-	public JsonFileCfgAccessor FromJson(str JsonStr){
-		CfgDict = ToolJson.JsonStrToDict(JsonStr)??MkDict();
-		return this;
-	}
-	// avoid static, keep fluent style
-	public async Task<JsonFileCfgAccessor> FromFile(str FilePath, CT Ct){
-		var z = this;
-		z.FilePath = FilePath;
-		var JsonStr = await File.ReadAllTextAsync(FilePath, Ct);
-		if(str.IsNullOrEmpty(JsonStr)){
-			z.CfgDict = MkDict();
-		}else{
-			z.CfgDict = ToolJson.JsonStrToDict(JsonStr)??MkDict();
-		}
-		return z;
-	}
+*事件*: 繼承 `DictCfgAccessor`, 所以 Set / Rm / Reload / Save 都會觸發 `ICfgEvents`。
+""")]
+public partial class JsonCfgAccessor : DictCfgAccessor{
 
+	[Doc(@$"讀的那份流; 沒設就沒有可讀的來源。")]
+	public Stream? InputStream{get;set;}
 
-	public JsonFileCfgAccessor FromFile(str FilePath){
-		var z = this;
-		z.FilePath = FilePath;
-		var JsonStr = File.ReadAllText(FilePath);
-		if(str.IsNullOrEmpty(JsonStr)){
-			z.CfgDict = MkDict();
-		}else{
-			z.CfgDict = ToolJson.JsonStrToDict(JsonStr)??MkDict();
-		}
-		return z;
-	}
+	[Doc(@$"寫的那份流; 沒設就保存不了。")]
+	public Stream? OutputStream{get;set;}
 
+	[Doc(@$"解析選項。默認允許註釋與尾逗號, 因為出廠配置是人手寫的。")]
+	public JsonDocumentOptions DocOpts{get;set;} = new(){
+		CommentHandling = JsonCommentHandling.Skip
+		,AllowTrailingCommas = true
+	};
 
-	[Impl]
-	public bool Reload(){
-		var b = Reload(default).Result;
-		return b;
-	}
+	[Doc(@$"寫出選項。默認縮排、不轉義非 ASCII, 這樣寫出來的文件還是人能讀的。")]
+	public JsonWriterOptions WriterOpts{get;set;} = new(){
+		Indented = true
+		,Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+	};
 
-	[Impl]
-	public async Task<bool> Reload(CT Ct) {
-		BeforeReload?.Invoke(this, new CfgChange(this));
-		if(FnReLoadAsy != null){
-			return await FnReLoadAsy(this, Ct);
-		}
-		await _ReloadAsy(Ct);
-		AfterReload?.Invoke(this, new CfgChange(this));
-		return true;
-	}
+	[Doc("""
+	#Prm[InputStream][讀的那份流; 可以傳 null。]
+	#Prm[OutputStream][寫的那份流; 可以傳 null, 但那樣 Save 會拋。]
+	#Prm[Name][源的技術標識。]
+	構造後立刻載入一次; 載入失敗會拋。
+	""")]
+	public partial JsonCfgAccessor(Stream? InputStream, Stream? OutputStream, str Name = "json");
 
-	public async Task<bool> _ReloadAsy(CT Ct) {
-		await FromFile(FilePath, Ct);
-		return true;
-	}
-	
-	[Impl(typeof(ICfgAccessor))]
-	public bool TryGet(
-		IReadOnlyList<str> Path, out obj? Got, out ICfgReader? Src
-	){
-		Got = default;
-		Src = null;
-		if( ToolDict.TryGetValueByPath(CfgDict, Path, out var VObj) ){
-			Got = VObj;
-			// 單源實現: 命中就是自己提供的
-			Src = this;
-			return true;
-		}
-		return false;
-	}
-	
-	[Impl(typeof(ICfgAccessor))]
-	public bool TrySetNoSave(IList<str> Path, obj? V){
-		return ToolDict.SetValueByPath(CfgDict, Path, V);
-	}
-	
+	[Doc(@$"立刻讀一次, 不觸發事件; 失敗拋。回傳解析結果, 同時寫進 {nameof(Dict)}。要事件就走 {nameof(Reload)}。")]
+	public partial IDictionary<str, obj?> Load();
 
-	[Impl]
-	public bool RmPathNoSave(IList<str> Path){
-		ToolDict.SetValueByPath(CfgDict, Path, NIL);
-		return true;
-	}
+	[Doc(@$"立刻讀一次(異步), 不觸發事件; 失敗拋。回傳解析結果, 同時寫進 {nameof(Dict)}。")]
+	public partial Task<IDictionary<str, obj?>> LoadAsy(CT Ct);
 
-	[Impl]
-	public bool Save(){
-		var b = Save(default).Result;
-		return b;
-	}
+	[Doc(@$"把整棵配置樹寫到 {nameof(OutputStream)}。沒有輸出流就拋。")]
+	private partial nil SaveToStream(IDictionary<str, obj?> Dict);
 
-
-	[Impl]
-	public async Task<bool> Save(CT Ct) {
-		BeforeSave?.Invoke(this, new CfgChange(this));
-		if(FnSaveAsy!=null){
-			return await FnSaveAsy(this, Ct);
-		}
-		var b = await _Save(Ct);
-		AfterSave?.Invoke(this, new CfgChange(this));
-		return b;
-	}
-
-	public async Task<bool> _Save(CT Ct) {
-		var Json = ToolJson.DictToJson(CfgDict);
-		await File.WriteAllTextAsync(FilePath, Json, Ct);
-		return true;
-	}
+	[Doc(@$"同 {nameof(SaveToStream)}, 但異步。")]
+	private partial Task<nil> SaveToStreamAsy(IDictionary<str, obj?> Dict);
 }
