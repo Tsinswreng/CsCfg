@@ -9,45 +9,41 @@ public static class ICfgReaderExtn{
 		};
 	}
 	
+	/// 無泛型鍵: 取裸值, 同時吐出命中的讀者。不要來源就自己棄元。
 	public static bool TryGet(
-		this ICfgReader z, IKeyNode KeyNode, out obj? Got
+		this ICfgReader z, IKeyNode KeyNode, out obj? Got, out ICfgReader? Src
 	){
-		
-		return z.TryGet(KeyNode.FullPathSegs, out Got, out _);
+		return z.TryGet(KeyNode.FullPathSegs, out Got, out Src);
 	}
 
-	/// 只要值、不要來源的寫法。來源用三參數版 TryGet 拿。
-	public static bool TryGet(
-		this ICfgReader z, IReadOnlyList<str> Path, out obj? Got
-	){
-		return z.TryGet(Path, out Got, out _);
-	}
-
-	
-	/// 型別化取值：T 由鍵的靜態型別推斷，取到後按值模型轉型。
-	/// 回 false 有兩種情形：沒有這個鍵，或值轉不成 T；
-	/// 要區分這兩者，先用收 IKeyNode 的裸值版 TryGet 看存在性，型別由調用方自己判。
+	/// 型別化取值：T 由鍵的靜態型別推斷，取到後按值模型轉型，同時吐出命中的讀者。
+	/// 回 false 一律 Src 為 null; 「沒有這個鍵」與「值轉不成 T」不在此區分,
+	/// 要區分就先走無泛型鍵那版看存在性。
 	public static bool TryGet<T>(
-		this ICfgReader z, IKeyNode<T> KeyNode, out T Value
+		this ICfgReader z, IKeyNode<T> KeyNode, out T Value, out ICfgReader? Src
 	){
 		Value = default!;
-		if(!z.TryGet(KeyNode.FullPathSegs, out var Got)){
+		if(!z.TryGet(KeyNode.FullPathSegs, out var Got, out Src)){
 			return false;
 		}
 		// 顯式設成 null 視為取到了值，Value 取 T 的默認值，不回鍵的默認值
 		if(Got is null){
 			return true;
 		}
-		return TryCoerce(Got, out Value);
+		if(!TryCoerce(Got, out Value)){
+			Src = null;
+			return false;
+		}
+		return true;
 	}
 
 	/// 按鍵取值：沒有這個鍵就回鍵上宣告的默認值；顯式設成 null 則回 T 的默認值。
-	/// 存在性與轉型全交給 TryGet，本函數只負責兜底。
+	/// 存在性與轉型全交給 TryGet，本函數只負責兜底。要來源就自己用 TryGet。
 	public static T Get<T>(
 		this ICfgReader z
 		,IKeyNode<T> CfgNode
 	){
-		if(!z.TryGet(CfgNode, out T Value)){
+		if(!z.TryGet(CfgNode, out T Value, out _)){
 			return CfgNode.Data;
 		}
 		return Value;

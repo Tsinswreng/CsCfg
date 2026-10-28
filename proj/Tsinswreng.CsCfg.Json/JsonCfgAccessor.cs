@@ -1,4 +1,4 @@
-﻿#define Impl
+#define Impl
 namespace Tsinswreng.CsCfg;
 using System.Collections;
 using Tsinswreng.CsCore;
@@ -76,11 +76,14 @@ public partial class JsonFileCfgAccessor
 	
 	[Impl(typeof(ICfgAccessor))]
 	public bool TryGet(
-		IList<str> Path, out obj? Got
+		IReadOnlyList<str> Path, out obj? Got, out ICfgReader? Src
 	){
 		Got = default;
+		Src = null;
 		if( ToolDict.TryGetValueByPath(CfgDict, Path, out var VObj) ){
 			Got = VObj;
+			// 單源實現: 命中就是自己提供的
+			Src = this;
 			return true;
 		}
 		return false;
