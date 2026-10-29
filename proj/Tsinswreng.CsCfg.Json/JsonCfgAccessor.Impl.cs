@@ -18,9 +18,11 @@ public partial class JsonCfgAccessor{
 	}
 
 	public partial IDictionary<str, obj?> Load(){
-		var S = InputStream ?? throw new InvalidOperationException(
-			$"{nameof(InputStream)} is not set. Assign a JSON stream before loading."
-		);
+		// 沒有流就沒有可讀的東西: 重載是 no-op, 不拋也不清空(理由同 JsonCfgReader)
+		if(InputStream is null){
+			return Dict;
+		}
+		var S = InputStream;
 		if(S.CanSeek){
 			S.Position = 0;
 		}
@@ -30,9 +32,10 @@ public partial class JsonCfgAccessor{
 	}
 
 	public partial async Task<IDictionary<str, obj?>> LoadAsy(CT Ct){
-		var S = InputStream ?? throw new InvalidOperationException(
-			$"{nameof(InputStream)} is not set. Assign a JSON stream before loading."
-		);
+		if(InputStream is null){
+			return Dict;
+		}
+		var S = InputStream;
 		if(S.CanSeek){
 			S.Position = 0;
 		}

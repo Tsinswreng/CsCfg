@@ -17,7 +17,7 @@ JSON 樹與本庫值模型之間的轉換。
 """)]
 public static partial class JsonCfgCodec{
 
-	[Doc(@$"把 UTF-8 JSON 文本解析成配置樹。根必須是對象, 否則拋 {nameof(InvalidDataException)}。")]
+	[Doc(@$"把 UTF-8 JSON 文本解析成配置樹。根必須是對象, 否則拋 {nameof(InvalidDataException)}。空流回空字典。")]
 	public static partial IDictionary<str, obj?> ParseObject(
 		Stream Utf8
 		,JsonDocumentOptions DocOpts

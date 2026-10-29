@@ -15,9 +15,12 @@ public partial class JsonCfgReader{
 	}
 
 	public partial IDictionary<str, obj?> Load(){
-		var S = InputStream ?? throw new InvalidOperationException(
-			$"{nameof(InputStream)} is not set. Assign a JSON stream before loading."
-		);
+		// 沒有流就沒有可讀的東西: 重載是 no-op, 不拋也不清空。
+		// 這條讓「開發配置檔在本機不存在」這種正常情形不必在每個宿主各寫一次判斷。
+		if(InputStream is null){
+			return Dict;
+		}
+		var S = InputStream;
 		// 回到開頭再解析; 不可 Seek 的流只能讀一次
 		if(S.CanSeek){
 			S.Position = 0;
@@ -29,9 +32,10 @@ public partial class JsonCfgReader{
 	}
 
 	public partial async Task<IDictionary<str, obj?>> Load(CT Ct){
-		var S = InputStream ?? throw new InvalidOperationException(
-			$"{nameof(InputStream)} is not set. Assign a JSON stream before loading."
-		);
+		if(InputStream is null){
+			return Dict;
+		}
+		var S = InputStream;
 		if(S.CanSeek){
 			S.Position = 0;
 		}

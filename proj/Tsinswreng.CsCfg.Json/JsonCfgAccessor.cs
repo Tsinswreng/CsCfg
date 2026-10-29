@@ -15,7 +15,7 @@ using Tsinswreng.CsCore;
 """)]
 public partial class JsonCfgAccessor : DictCfgAccessor{
 
-	[Doc(@$"讀的那份流; 沒設就沒有可讀的來源。")]
+	[Doc(@$"讀的那份流; 沒設就沒有可讀的來源, 此後重載一律 no-op, 不拋。")]
 	public Stream? InputStream{get;set;}
 
 	[Doc(@$"寫的那份流; 沒設就保存不了。")]

@@ -126,15 +126,26 @@ public partial class TestJsonCfg{
 			return null;
 		});
 
-		R("沒設流就載入會拋", async (o) => {
+		R("空流回空字典而不是拋", async (o) => {
+			// 首次啟動時 GUI 那份配置檔就是零字節; 這不能算格式錯誤
+			using var In = MkStream("");
+			var Rdr = new JsonCfgReader(In, "json");
+
+			T(Rdr.Dict.Count == 0, "空流應該得到空字典");
+			T(!Rdr.TryGet(["Any"], out _, out _), "空字典裡什麼都沒有");
+			return null;
+		});
+
+		R("沒設流時載入與重載都不拋, 且不清空", async (o) => {
 			var Rdr = new JsonCfgReader(null, "json");
-			var Threw = false;
-			try{
-				Rdr.Load();
-			}catch(InvalidOperationException){
-				Threw = true;
-			}
-			T(Threw, "InputStream 沒設就該拋");
+			// 先塞一點東西進去, 用來驗證 no-op 不會把它清掉
+			Rdr.Dict["K"] = (i64)1;
+
+			// 源可選: 沒有流就沒有可讀的東西, 重載是 no-op
+			Rdr.Reload();
+
+			T(Rdr.TryGet(["K"], out var Got, out _), "no-op 不該清掉已有的值");
+			T(Got is i64 L && L == 1, "值應該還在");
 			return null;
 		});
 	}
