@@ -7,7 +7,7 @@ using Tsinswreng.CsCore;
 以一份 JSON 檔案為來源的唯讀配置源。
 
 *檔案系統只出現在這一層*: 上面兩層不認識檔案。本類只做兩件事: 記住路徑, 以及把
-{{nameof(JsonCfgReader.OpenInputStream)}} 與 {{nameof(JsonCfgReader.CloseInputStream)}} 換成
+{{nameof(OpenInputStream)}} 與 {{nameof(CloseInputStream)}} 換成
 「每次讀取開一次檔、讀完關掉」。解析、鍵序、事件全由基底類負責。
 
 *檔案不存在時*: 是一個空源, 不是錯誤。建構與 {{nameof(Load)}} 都會得到空字典,

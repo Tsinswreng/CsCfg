@@ -75,6 +75,58 @@ public partial class TestFileCfg{
 			}
 		});
 
+		R("兩次讀取之間檔案被改掉, 重讀讀到新內容", async (o) => {
+			var Dir = MkTempDir();
+			try{
+				var FilePath = System.IO.Path.Combine(Dir, "cfg.jsonc");
+				MkFile(FilePath, """{"Lang": "en"}""");
+				var Cfg = new JsonFileCfgAccessor(FilePath, "gui");
+				T(Cfg.TryGet(["Lang"], out var First, out _), "第一次應該讀得到");
+				T((str?)First == "en", "第一次是 en");
+
+				// 模擬別的程式把這份檔案換掉
+				MkFile(FilePath, """{"Lang": "zh-CN"}""");
+				Cfg.Reload();
+
+				T(Cfg.TryGet(["Lang"], out var Second, out _), "重讀之後應該還有 Lang");
+				// 這一條測的是「每次讀取都重新開檔」; 若只握著建構時那條流, 這裡會還是 en
+				T((str?)Second == "zh-CN", "重讀應該看到新內容");
+				return null;
+			}
+			finally{
+				RmTempDir(Dir);
+			}
+		});
+
+		R("保存失敗時正式檔保持原樣", async (o) => {
+			var Dir = MkTempDir();
+			try{
+				var FilePath = System.IO.Path.Combine(Dir, "cfg.rw.jsonc");
+				MkFile(FilePath, """{"keep": 1}""");
+				var Cfg = new JsonFileCfgAccessor(FilePath, "gui");
+
+				// 用同名目錄佔住暫存檔路徑, 讓「開暫存檔」這一步失敗
+				Directory.CreateDirectory(FilePath + ".tmp");
+
+				var Threw = false;
+				try{
+					Cfg.Save();
+				}catch(IOException){
+					Threw = true;
+				}catch(UnauthorizedAccessException){
+					Threw = true;
+				}
+
+				T(Threw, "開不了暫存檔應該拋");
+				// 原子寫的意義就在這裡: 失敗也不能動到正式檔
+				T(ReadFile(FilePath).Contains("keep"), "正式檔應該保持原樣");
+				return null;
+			}
+			finally{
+				RmTempDir(Dir);
+			}
+		});
+
 		R("Save(CT) 的取消令牌會傳到 FnSaveAsy", async (o) => {
 			// 這一條測的是庫的契約, 不是檔案源: 先前 Save(CT) 把令牌丟掉, 取消對寫盤完全無效
 			var Cfg = new DictCfgAccessor{ Name = "mem" };

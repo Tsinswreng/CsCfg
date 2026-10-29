@@ -16,7 +16,7 @@ public partial class TestRoRw{
 		var T = Assert.IsTrue;
 
 		R("兩邊都有同一個鍵時, 只讀那份贏", async (o) => {
-			var Ro = MkRo(("Lang", "ro"), ("OnlyRo", 1));
+			var Ro = MkRo(("Lang", "ro"), ("OnlyRo", 1L));
 			var Rw = MkRw(("Lang", "rw"));
 			var F = new LayeredCfgAccessor();
 
@@ -28,6 +28,28 @@ public partial class TestRoRw{
 			T(ReferenceEquals(Src, Ro), "命中源應該是只讀源");
 			T(F.TryGet(["OnlyRo"], out var Only, out _), "只有只讀那份有的鍵也取得到");
 			T(Only is i64 N && N == 1, "OnlyRo 應該是 i64 1");
+			return null;
+		});
+
+		R("讀源有多個時, 依清單順序決定優先級", async (o) => {
+			var Env = MkRo(("Lang", "env"), ("Theme", "dark"));
+			var File = MkRo(("Lang", "file"), ("Size", 14L));
+			var Rw = MkRw(("Lang", "rw"), ("Size", 99L), ("OnlyRw", "x"));
+			var F = new LayeredCfgAccessor();
+
+			F.SetRoRw([Env, File], Rw);
+
+			T(F.TryGet(["Lang"], out var Lang, out var LangSrc), "應該取得到 Lang");
+			T((str?)Lang == "env", "三個源都有時, 第一個讀源贏");
+			T(ReferenceEquals(LangSrc, Env), "命中源應該是第一個讀源");
+			T(F.TryGet(["Theme"], out var Theme, out _), "只有第一個讀源有的鍵也取得到");
+			T((str?)Theme == "dark", "Theme 應該來自第一個讀源");
+			T(F.TryGet(["Size"], out var Size, out var SizeSrc), "第二個讀源有的鍵取得到");
+			T(Size is i64 S && S == 14, "Size 應該來自第二個讀源, 不是可寫源");
+			T(ReferenceEquals(SizeSrc, File), "命中源應該是第二個讀源");
+			T(F.TryGet(["OnlyRw"], out var OnlyRw, out var RwSrc), "只有可寫源有的鍵也取得到");
+			T((str?)OnlyRw == "x", "OnlyRw 應該來自可寫源");
+			T(ReferenceEquals(RwSrc, Rw), "命中源應該是可寫源");
 			return null;
 		});
 

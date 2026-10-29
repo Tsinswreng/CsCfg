@@ -2,6 +2,7 @@ namespace Tsinswreng.CsCfg.Json;
 
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using Tsinswreng.CsCore;
 
 [Doc($$"""
 JSON 源的默認解析／寫出選項，只在本程序集內用。
