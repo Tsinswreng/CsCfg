@@ -8,8 +8,8 @@ public partial class TestRoRw{
 	public void RegisterSetRoRw(ITestNode Node){
 		var register = Node.MkTestFnRegister(
 			typeof(TestRoRw),
-			[typeof(LayeredCfgAccessorExtn)],
-			[nameof(LayeredCfgAccessorExtn.SetRoRw)],
+			[typeof(ILayeredCfgAccessorExtn)],
+			[nameof(ILayeredCfgAccessorExtn.SetRoRw)],
 			"SetRoRw"
 		);
 		var R = register.Register;
@@ -20,7 +20,7 @@ public partial class TestRoRw{
 			var Rw = MkRw(("Lang", "rw"));
 			var F = new LayeredCfgAccessor();
 
-			F.SetRoRw(Ro, Rw);
+			F.SetRoRw([Ro], Rw);
 
 			T(F.TryGet(["Lang"], out var Lang, out var Src), "應該取得到 Lang");
 			T((str?)Lang == "ro", "只讀那份的值應該贏");
@@ -35,7 +35,7 @@ public partial class TestRoRw{
 			var Ro = MkRo(("Lang", "ro"));
 			var Rw = MkRw(("Lang", "rw"));
 			var F = new LayeredCfgAccessor();
-			F.SetRoRw(Ro, Rw);
+			F.SetRoRw([Ro], Rw);
 
 			T(F.TrySetNoSave(["Lang"], "new"), "應該寫得進去");
 			T(F.TryGet(["Lang"], out var Lang, out _), "寫完仍取得到");
@@ -53,7 +53,7 @@ public partial class TestRoRw{
 
 			var Threw = false;
 			try{
-				F.SetRoRw(One, One);
+				F.SetRoRw([One], One);
 			}catch(ArgumentException){
 				Threw = true;
 			}

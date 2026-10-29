@@ -1,4 +1,4 @@
-// 一個 tester 對應一個被測成員: LayeredCfgAccessorExtn.SetRoRw。
+// 一個 tester 對應一個被測成員: ILayeredCfgAccessorExtn.SetRoRw。
 // 主文件以下劃線開頭, 只負責組裝與提供造源的輔助, 不在主文件裏寫用例。
 using Tsinswreng.CsTreeTest;
 using Tsinswreng.CsCfg;
