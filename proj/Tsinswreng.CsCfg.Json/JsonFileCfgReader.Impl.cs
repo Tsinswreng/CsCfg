@@ -5,30 +5,24 @@ using Tsinswreng.CsCore;
 
 public partial class JsonFileCfgReader{
 
-	public partial JsonFileCfgReader(str Path, str Name){
+	public partial JsonFileCfgReader(str Path, str Name) : base(null, Name){
 		if(str.IsNullOrWhiteSpace(Path)){
 			throw new ArgumentException("Config file path is empty.", nameof(Path));
 		}
 		// 正規化: 分隔符與相對段先收掉, 之後日誌裡的路徑只有一種寫法
 		this.Path = System.IO.Path.GetFullPath(Path);
-		this.Name = Name;
-		// 重讀接到檔案上: 之後的 Reload 就是重開檔再解析, 事件由基底類拋
-		this.FnReload = Load;
-		this.FnReloadAsy = Load;
-		// 建構時讀一次, 但不走 Reload: 建構期間宿主還沒機會訂閱, 拋事件沒有意義
+		// 建構時讀一次, 但走的是基底類的 Load, 它會呼叫本類覆寫的 OpenInputStream
 		Load();
 	}
 
-	public partial IDictionary<str, obj?> Load(){
-		// 檔案不存在就是空字典(由 IO 層決定), 這裡不再判斷
-		var Parsed = JsonCfgFileIo.Read(Path, DocOpts, MkDict);
-		Dict = Parsed;
-		return Parsed;
+	[Doc(@$"每次都開一條新的讀取流; 檔案不存在時拿到空流, 上層因此得到空配置。")]
+	protected override Stream? OpenInputStream(){
+		return JsonCfgFileIo.OpenRead(Path);
 	}
 
-	public partial async Task<IDictionary<str, obj?>> Load(CT Ct){
-		var Parsed = await JsonCfgFileIo.Read(Path, DocOpts, MkDict, Ct);
-		Dict = Parsed;
-		return Parsed;
+	[Doc(@$"讀完就關: 本類不長期持有檔案。")]
+	protected override nil CloseInputStream(Stream Utf8){
+		Utf8.Dispose();
+		return NIL;
 	}
 }

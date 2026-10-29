@@ -6,7 +6,7 @@ using System.Text.Json;
 [Doc($$"""
 JSON 源的默認解析／寫出選項，只在本程序集內用。
 
-*為何要抽出來*：{nameof(JsonCfgReader)}、{nameof(JsonCfgAccessor)} 與檔案式的那兩個源都要同一組默認值。
+*為何要抽出來*：{{nameof(JsonCfgReader)}}、{{nameof(JsonCfgAccessor)}} 與檔案式的那兩個源都要同一組默認值。
 各寫一份的話，改一處就會出現「流式源允許註釋、檔案源不允許」這種不一致，而且很難看出來。
 
 *為何可以是共用欄位*：`JsonDocumentOptions` 與 `JsonWriterOptions` 都是結構體，

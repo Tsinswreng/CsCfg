@@ -5,40 +5,35 @@ using Tsinswreng.CsCore;
 
 public partial class JsonFileCfgAccessor{
 
-	public partial JsonFileCfgAccessor(str Path, str Name){
+	public partial JsonFileCfgAccessor(str Path, str Name) : base(null, null, Name){
 		if(str.IsNullOrWhiteSpace(Path)){
 			throw new ArgumentException("Config file path is empty.", nameof(Path));
 		}
 		this.Path = System.IO.Path.GetFullPath(Path);
-		this.Name = Name;
-
-		// 重讀／保存全部接到檔案上; 基底類只提供抽象與寫入路由, 不知道「檔案」這回事
-		this.FnReload = Load;
-		this.FnReloadAsy = Load;
-		this.FnSave = SaveFile;
-		this.FnSaveAsy = SaveFile;
-
-		// 建構時讀一次, 但不走 Reload(理由見宣告處); 同時把既有內容讀進來, 免第一次 Save 蓋掉它
+		// 建構時讀一次, 走的是基底類的 Load, 它會呼叫本類覆寫的 OpenInputStream
 		Load();
 	}
 
-	public partial IDictionary<str, obj?> Load(){
-		var Parsed = JsonCfgFileIo.Read(Path, DocOpts, MkDict);
-		Dict = Parsed;
-		return Parsed;
+	[Doc(@$"每次都開一條新的讀取流; 檔案不存在時拿到空流, 上層因此得到空配置。")]
+	protected override Stream? OpenInputStream(){
+		return JsonCfgFileIo.OpenRead(Path);
 	}
 
-	public partial async Task<IDictionary<str, obj?>> Load(CT Ct){
-		var Parsed = await JsonCfgFileIo.Read(Path, DocOpts, MkDict, Ct);
-		Dict = Parsed;
-		return Parsed;
+	[Doc(@$"讀完就關: 本類不長期持有檔案。")]
+	protected override nil CloseInputStream(Stream Utf8){
+		Utf8.Dispose();
+		return NIL;
 	}
 
-	private partial nil SaveFile(IDictionary<str, obj?> Dict){
-		return JsonCfgFileIo.Write(Path, Dict, WriterOpts);
+	[Doc(@$"每次保存都開一條新的寫入流, 寫的是暫存檔; 正式檔在它上面不動。")]
+	protected override Stream? OpenOutputStream(){
+		return JsonCfgFileIo.OpenTmp(Path);
 	}
 
-	private partial Task<nil> SaveFile(IDictionary<str, obj?> Dict, CT Ct){
-		return JsonCfgFileIo.Write(Path, Dict, WriterOpts, Ct);
+	[Doc(@$"關掉暫存檔, 並依 {nameof(Ok)} 決定搬移覆蓋正式檔或刪掉暫存檔。")]
+	protected override nil CloseOutputStream(Stream Utf8, bool Ok){
+		Utf8.Dispose();
+		JsonCfgFileIo.FinishTmp(Path, Ok);
+		return NIL;
 	}
 }

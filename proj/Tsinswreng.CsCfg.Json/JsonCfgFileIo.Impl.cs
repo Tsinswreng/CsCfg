@@ -1,92 +1,42 @@
 //Impl: 聲明見 JsonCfgFileIo.cs。
 namespace Tsinswreng.CsCfg.Json;
 
-using System.Text.Json;
 using Tsinswreng.CsCore;
 
 internal static partial class JsonCfgFileIo{
 
-	internal static partial IDictionary<str, obj?> Read(
-		str FilePath
-		,JsonDocumentOptions DocOpts
-		,Func<IDictionary<str, obj?>> MkDict
-	){
+	internal static partial Stream OpenRead(str FilePath){
 		try{
 			// 共享打開: 別人正在編輯或讀取這份檔案時不擋
-			using var S = new FileStream(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+			var S = new FileStream(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 			SkipBom(S);
-			return JsonCfgCodec.ParseObject(S, DocOpts, MkDict);
+			return S;
 		}
 		catch(FileNotFoundException){
 			// 先 File.Exists 再開檔會有 TOCTOU(兩步之間被刪掉), 所以按例外來判「不存在」
-			return MkDict();
+			return new MemoryStream();
 		}
 		catch(DirectoryNotFoundException){
 			// 連目錄都還沒有: 與「檔案不存在」同義, 首次啟動的正常情形
-			return MkDict();
+			return new MemoryStream();
 		}
 	}
 
-	internal static partial async Task<IDictionary<str, obj?>> Read(
-		str FilePath
-		,JsonDocumentOptions DocOpts
-		,Func<IDictionary<str, obj?>> MkDict
-		,CT Ct
-	){
-		try{
-			await using var S = new FileStream(
-				FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 4096, useAsync: true
-			);
-			SkipBom(S);
-			return await JsonCfgCodec.ParseObject(S, DocOpts, MkDict, Ct);
-		}
-		catch(FileNotFoundException){
-			return MkDict();
-		}
-		catch(DirectoryNotFoundException){
-			return MkDict();
-		}
-	}
-
-	internal static partial nil Write(
-		str FilePath
-		,IDictionary<str, obj?> Dict
-		,JsonWriterOptions WriterOpts
-	){
-		// 先把目錄與暫存檔路徑算出來: 這兩步失敗時還沒有動到正式檔, 不必清理
+	internal static partial Stream OpenTmp(str FilePath){
 		var Tmp = MkTmpPath(FilePath);
-		try{
-			using(var S = new FileStream(Tmp, FileMode.Create, FileAccess.Write, FileShare.None)){
-				JsonCfgCodec.Write(Dict, S, WriterOpts);
-			}
-			Replace(Tmp, FilePath);
-		}
-		catch{
-			// 寫到一半失敗: 清掉半份暫存檔再往上拋, 正式檔仍是舊的完整版
-			TryDel(Tmp);
-			throw;
-		}
-		return NIL;
+		// 暫存檔不與別人共享: 它只屬於這次寫入
+		return new FileStream(Tmp, FileMode.Create, FileAccess.Write, FileShare.None);
 	}
 
-	internal static partial async Task<nil> Write(
-		str FilePath
-		,IDictionary<str, obj?> Dict
-		,JsonWriterOptions WriterOpts
-		,CT Ct
-	){
-		var Tmp = MkTmpPath(FilePath);
-		try{
-			await using(var S = new FileStream(
-				Tmp, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true
-			)){
-				await JsonCfgCodec.Write(Dict, S, WriterOpts, Ct);
-			}
-			Replace(Tmp, FilePath);
+	internal static partial nil FinishTmp(str FilePath, bool Ok){
+		var Tmp = FilePath + ".tmp";
+		if(Ok){
+			// 覆蓋式搬移: 同一卷內是一次 rename, 正式檔不會停留在半份狀態
+			File.Move(Tmp, FilePath, overwrite: true);
 		}
-		catch{
+		else{
+			// 寫到一半失敗: 清掉半份暫存檔, 正式檔仍是舊的完整版
 			TryDel(Tmp);
-			throw;
 		}
 		return NIL;
 	}
@@ -102,9 +52,23 @@ internal static partial class JsonCfgFileIo{
 		return FilePath + ".tmp";
 	}
 
-	private static partial nil Replace(str TmpPath, str FilePath){
-		// 覆蓋式搬移: 同一卷內是一次 rename, 正式檔不會停留在「半份」狀態
-		File.Move(TmpPath, FilePath, overwrite: true);
+	private static partial nil SkipBom(Stream Utf8){
+		if(!Utf8.CanSeek){
+			return NIL;
+		}
+		// 先讀三個字節再看: 檔案頭不足三個字節時就是沒有 BOM, 回到開頭即可
+		var Head = new byte[3];
+		var N = 0;
+		while(N < Head.Length){
+			var Got = Utf8.Read(Head, N, Head.Length - N);
+			if(Got <= 0){
+				break;
+			}
+			N += Got;
+		}
+		var HasBom = N == Head.Length
+			&& Head[0] == 0xEF && Head[1] == 0xBB && Head[2] == 0xBF;
+		Utf8.Position = HasBom ? Head.Length : 0;
 		return NIL;
 	}
 
@@ -120,25 +84,5 @@ internal static partial class JsonCfgFileIo{
 		catch(UnauthorizedAccessException){
 			// 同上: 清理是盡力而為, 不該讓它變成第二個例外
 		}
-	}
-
-	private static partial nil SkipBom(Stream S){
-		if(!S.CanSeek){
-			return NIL;
-		}
-		// 先讀三個字節再看: 檔案頭不足三個字節時就是沒有 BOM, 回到開頭即可
-		var Head = new byte[3];
-		var N = 0;
-		while(N < Head.Length){
-			var Got = S.Read(Head, N, Head.Length - N);
-			if(Got <= 0){
-				break;
-			}
-			N += Got;
-		}
-		var HasBom = N == Head.Length
-			&& Head[0] == 0xEF && Head[1] == 0xBB && Head[2] == 0xBF;
-		S.Position = HasBom ? Head.Length : 0;
-		return NIL;
 	}
 }
