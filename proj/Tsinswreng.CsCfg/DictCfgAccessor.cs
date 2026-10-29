@@ -7,15 +7,19 @@ using Tsinswreng.CsCore;
 
 寫入只改內存裡的配置樹, 落盤由 `FnSave` / `FnSaveAsy` 負責;
 所以 `TrySetNoSave` 與 `RmPathNoSave` 之後必須再呼叫 `Save`, 才會進到檔案。
-這也是與「出廠配置檔唯讀」配套的分工: 出廠那份只讀, 寫入只落程序專用的那份。
+這也是與「唯讀源在前、可寫源在後」配套的分工: 唯讀那份不該被寫, 寫入只落可寫那份。
 """)]
 public class DictCfgAccessor : DictCfgReader, ICfgAccessor{
 
 	[Doc(@$"同步保存; 參數是當前整棵配置樹。")]
 	public Func<IDictionary<str, obj?>, nil>? FnSave{get;set;}
 
-	[Doc(@$"異步保存; 參數是當前整棵配置樹。")]
-	public Func<IDictionary<str, obj?>, Task<nil>>? FnSaveAsy{get;set;}
+	[Doc(@$"
+	異步保存; 參數是當前整棵配置樹與取消令牌。
+	*為何帶 {nameof(CT)}*: 保存是 IO, 大配置檔寫入可能耗時; 不帶令牌的話
+	{nameof(Save)} 收到的 {nameof(CT)} 就只能丟掉, 呼叫方以為取消了其實還在寫盤。
+	")]
+	public Func<IDictionary<str, obj?>, CT, Task<nil>>? FnSaveAsy{get;set;}
 
 	[Doc(@$"
 	按路徑寫值, 只改內存。
@@ -63,7 +67,8 @@ public class DictCfgAccessor : DictCfgReader, ICfgAccessor{
 			throw new InvalidOperationException($"{nameof(FnSaveAsy)} is not set. Assign a save target before calling {nameof(Save)}.");
 		}
 		OnBeforeSave(new CfgChange(this));
-		var R = await FnSaveAsy(Dict);
+		// Ct 一路傳到真正寫盤的那一層: 先前的版本把它丟在這裡, 於是取消永遠無效
+		var R = await FnSaveAsy(Dict, Ct);
 		OnAfterSave(new CfgChange(this));
 		return R;
 	}

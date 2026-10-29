@@ -39,7 +39,7 @@ public partial class JsonCfgReader{
 		if(S.CanSeek){
 			S.Position = 0;
 		}
-		var Parsed = await JsonCfgCodec.ParseObjectAsy(S, DocOpts, MkDict, Ct);
+		var Parsed = await JsonCfgCodec.ParseObject(S, DocOpts, MkDict, Ct);
 		Dict = Parsed;
 		return Parsed;
 	}

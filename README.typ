@@ -27,4 +27,3 @@ Configuration system for C\#
 dotnet add package Tsinswreng.CsCfg --version 0.0.1-alpha
 ```
 
-

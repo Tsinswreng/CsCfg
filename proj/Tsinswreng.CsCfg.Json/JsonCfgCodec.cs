@@ -25,7 +25,7 @@ public static partial class JsonCfgCodec{
 	);
 
 	[Doc(@$"同 {nameof(ParseObject)}, 但異步讀流。")]
-	public static partial Task<IDictionary<str, obj?>> ParseObjectAsy(
+	public static partial Task<IDictionary<str, obj?>> ParseObject(
 		Stream Utf8
 		,JsonDocumentOptions DocOpts
 		,Func<IDictionary<str, obj?>> MkDict
@@ -46,7 +46,7 @@ public static partial class JsonCfgCodec{
 	);
 
 	[Doc(@$"同 {nameof(Write)}, 但異步寫流。")]
-	public static partial Task<nil> WriteAsy(
+	public static partial Task<nil> Write(
 		IDictionary<str, obj?> Dict
 		,Stream Utf8
 		,JsonWriterOptions WriterOpts

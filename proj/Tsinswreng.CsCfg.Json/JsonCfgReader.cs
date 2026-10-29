@@ -15,11 +15,8 @@ public partial class JsonCfgReader : DictCfgReader{
 	[Doc(@$"讀的那份流; 沒設就沒有來源, 此後重載一律 no-op, 不拋。")]
 	public Stream? InputStream{get;set;}
 
-	[Doc(@$"解析選項。默認允許註釋與尾逗號, 因為出廠配置是人手寫的。")]
-	public JsonDocumentOptions DocOpts{get;set;} = new(){
-		CommentHandling = JsonCommentHandling.Skip
-		,AllowTrailingCommas = true
-	};
+	[Doc(@$"解析選項。默認允許註釋與尾逗號, 因為配置檔常由人手寫。默認值見 {nameof(JsonCfgOpts)}。")]
+	public JsonDocumentOptions DocOpts{get;set;} = JsonCfgOpts.DfltDocOpts;
 
 	[Doc("""
 	#Prm[InputStream][讀的那份流; 可以傳 null, 之後再設並呼叫 Reload。]

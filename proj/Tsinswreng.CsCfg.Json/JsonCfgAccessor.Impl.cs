@@ -9,9 +9,9 @@ public partial class JsonCfgAccessor{
 		this.Name = Name;
 		// 讀寫都接到流上; 之後 Reload / Save 就是解析與重寫整份
 		this.FnReload = Load;
-		this.FnReloadAsy = LoadAsy;
+		this.FnReloadAsy = Load;
 		this.FnSave = SaveToStream;
-		this.FnSaveAsy = SaveToStreamAsy;
+		this.FnSaveAsy = SaveToStream;
 		if(InputStream is not null){
 			Load();
 		}
@@ -31,7 +31,7 @@ public partial class JsonCfgAccessor{
 		return Parsed;
 	}
 
-	public partial async Task<IDictionary<str, obj?>> LoadAsy(CT Ct){
+	public partial async Task<IDictionary<str, obj?>> Load(CT Ct){
 		if(InputStream is null){
 			return Dict;
 		}
@@ -39,7 +39,7 @@ public partial class JsonCfgAccessor{
 		if(S.CanSeek){
 			S.Position = 0;
 		}
-		var Parsed = await JsonCfgCodec.ParseObjectAsy(S, DocOpts, MkDict, Ct);
+		var Parsed = await JsonCfgCodec.ParseObject(S, DocOpts, MkDict, Ct);
 		Dict = Parsed;
 		return Parsed;
 	}
@@ -57,7 +57,7 @@ public partial class JsonCfgAccessor{
 		return NIL;
 	}
 
-	private partial async Task<nil> SaveToStreamAsy(IDictionary<str, obj?> Dict){
+	private partial async Task<nil> SaveToStream(IDictionary<str, obj?> Dict, CT Ct){
 		var S = OutputStream ?? throw new InvalidOperationException(
 			$"{nameof(OutputStream)} is not set. Assign a JSON stream before saving."
 		);
@@ -65,6 +65,6 @@ public partial class JsonCfgAccessor{
 			S.SetLength(0);
 			S.Position = 0;
 		}
-		return await JsonCfgCodec.WriteAsy(Dict, S, WriterOpts, default);
+		return await JsonCfgCodec.Write(Dict, S, WriterOpts, Ct);
 	}
 }

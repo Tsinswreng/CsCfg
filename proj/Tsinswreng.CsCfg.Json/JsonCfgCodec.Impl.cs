@@ -24,7 +24,7 @@ public static partial class JsonCfgCodec{
 		return (IDictionary<str, obj?>)ToValue(Root, MkDict)!;
 	}
 
-	public static partial async Task<IDictionary<str, obj?>> ParseObjectAsy(
+	public static partial async Task<IDictionary<str, obj?>> ParseObject(
 		Stream Utf8
 		,JsonDocumentOptions DocOpts
 		,Func<IDictionary<str, obj?>> MkDict
@@ -108,7 +108,7 @@ public static partial class JsonCfgCodec{
 		return NIL;
 	}
 
-	public static partial async Task<nil> WriteAsy(
+	public static partial async Task<nil> Write(
 		IDictionary<str, obj?> Dict
 		,Stream Utf8
 		,JsonWriterOptions WriterOpts

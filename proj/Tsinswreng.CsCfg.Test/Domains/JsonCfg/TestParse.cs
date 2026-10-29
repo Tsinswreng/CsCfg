@@ -16,7 +16,7 @@ public partial class TestJsonCfg{
 		var T = Assert.IsTrue;
 
 		R("允許註釋與尾逗號", async (o) => {
-			// 出廠配置是人手寫的, 所以默認要吃得下這兩種寫法
+			// 配置檔是人手寫的, 所以默認要吃得下這兩種寫法
 			var Text = """
 			{
 				// 界面語言
@@ -127,7 +127,7 @@ public partial class TestJsonCfg{
 		});
 
 		R("空流回空字典而不是拋", async (o) => {
-			// 首次啟動時 GUI 那份配置檔就是零字節; 這不能算格式錯誤
+			// 首次啟動時可寫那份配置檔就是零字節; 這不能算格式錯誤
 			using var In = MkStream("");
 			var Rdr = new JsonCfgReader(In, "json");
 

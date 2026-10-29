@@ -1,6 +1,5 @@
 namespace Tsinswreng.CsCfg.Json;
 
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using Tsinswreng.CsCore;
 
@@ -21,17 +20,11 @@ public partial class JsonCfgAccessor : DictCfgAccessor{
 	[Doc(@$"寫的那份流; 沒設就保存不了。")]
 	public Stream? OutputStream{get;set;}
 
-	[Doc(@$"解析選項。默認允許註釋與尾逗號, 因為出廠配置是人手寫的。")]
-	public JsonDocumentOptions DocOpts{get;set;} = new(){
-		CommentHandling = JsonCommentHandling.Skip
-		,AllowTrailingCommas = true
-	};
+	[Doc(@$"解析選項。默認允許註釋與尾逗號, 因為配置檔常由人手寫。默認值見 {nameof(JsonCfgOpts)}。")]
+	public JsonDocumentOptions DocOpts{get;set;} = JsonCfgOpts.DfltDocOpts;
 
-	[Doc(@$"寫出選項。默認縮排、不轉義非 ASCII, 這樣寫出來的文件還是人能讀的。")]
-	public JsonWriterOptions WriterOpts{get;set;} = new(){
-		Indented = true
-		,Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-	};
+	[Doc(@$"寫出選項。默認縮排、不轉義非 ASCII, 這樣寫出來的文件還是人能讀的。默認值見 {nameof(JsonCfgOpts)}。")]
+	public JsonWriterOptions WriterOpts{get;set;} = JsonCfgOpts.DfltWriterOpts;
 
 	[Doc("""
 	#Prm[InputStream][讀的那份流; 可以傳 null。]
@@ -45,11 +38,11 @@ public partial class JsonCfgAccessor : DictCfgAccessor{
 	public partial IDictionary<str, obj?> Load();
 
 	[Doc(@$"立刻讀一次(異步), 不觸發事件; 失敗拋。回傳解析結果, 同時寫進 {nameof(Dict)}。")]
-	public partial Task<IDictionary<str, obj?>> LoadAsy(CT Ct);
+	public partial Task<IDictionary<str, obj?>> Load(CT Ct);
 
 	[Doc(@$"把整棵配置樹寫到 {nameof(OutputStream)}。沒有輸出流就拋。")]
 	private partial nil SaveToStream(IDictionary<str, obj?> Dict);
 
 	[Doc(@$"同 {nameof(SaveToStream)}, 但異步。")]
-	private partial Task<nil> SaveToStreamAsy(IDictionary<str, obj?> Dict);
+	private partial Task<nil> SaveToStream(IDictionary<str, obj?> Dict, CT Ct);
 }
